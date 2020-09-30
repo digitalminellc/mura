@@ -103,7 +103,13 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 
 		<cfset var hasStructuredAssets = not isdefined('arguments.Bundle.getValue') or arguments.Bundle.getValue("hasstructuredassets",true) />
 
-		<cfif isBoolean(hasStructuredAssets) and NOT hasStructuredAssets>			
+		<cfif not isBoolean(hasStructuredAssets)>
+			<cfset hasStructuredAssets=true>
+		</cfif>
+		<cfif hasStructuredAssets and getBean('settingsManager').getSite(arguments.tositeid).getHasSharedFilePool()>
+			<cfthrow message="You are not allowed to deploy bundles that include files to sites with shared file pools">
+		</cfif>
+		<cfif NOT hasStructuredAssets>			
 			<cfset arguments.keyMode = "publish">
 		</cfif>
 		
