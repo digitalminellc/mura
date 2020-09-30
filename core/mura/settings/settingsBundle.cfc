@@ -620,87 +620,52 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 						</cftry>
 					</cfif>
 				</cfif>
-
-				<!---
-					Contains work around for
-					https://luceeserver.atlassian.net/browse/LDEV-2660
-				--->
-				<cfset var hasFilesZip= fileExists( getBundle() & "filefiles.zip" )>
-				<cfset var hasAssetsZip= fileExists( getBundle() & "assetfiles.zip" )>
-
 				<cfif fileExists( getBundle() & "sitefiles.zip" )>
 					<cfset zipPath = getBundle() & "sitefiles.zip" />
-				
-					<cfif not hasFilesZip or not hasAssetsZip>
-						<cfset var fileDir = variables.configBean.getValue('filedir') & '/' & filePoolID />
-						<cfset var assetDir = variables.configBean.getValue('assetdir') & '/' & filePoolID />
-						
-						<cfzip file="#zipPath#" action="list" name="rsfiles">
 
-						<cfloop query="rsfiles">
-							<cfset filename=variables.fileWriter.pathFormat(rsfiles.name)>
-							<cfif not hasFilesZip and listFindNoCase('cache',listFirst(filename,"/"))>
-								<cfif fileExists(fileDir & "/" & filename)>
-									<cfset fileDelete(fileDir & "/" & filename)>
-								</cfif>
-								<cfzip file="#zipPath#" action="unzip" overwrite="false" destination="#fileDir#" entrypath="#rsfiles.directory#" filter="#listLast(filename,'/')#">
-							</cfif>
-							<cfif not hasAssetsZip and listFindNoCase('assets',listFirst(filename,"/"))>
-								<cfif fileExists(assetDir & "/" & filename)>
-									<cfset fileDelete(assetDir & "/" & filename)>
-								</cfif>
-								<cfzip file="#zipPath#" action="unzip" overwrite="false" destination="#assetDir#" entrypath="#rsfiles.directory#" filter="#listLast(filename,'/')#">
-							</cfif>
-						</cfloop>
+					<cfif not fileExists( getBundle() & "filefiles.zip" )>
+						<cfset destDir = variables.configBean.getValue('filedir') & '/' & filePoolID />
+						<cfzip file="#zipPath#" action="unzip" overwrite="false" destination="#destDir#" entrypath="cache">
+						<!---<cfset variables.zipTool.Extract(zipFilePath="#zipPath#",extractPath=destDir, overwriteFiles=true, extractDirs="cache")>--->
+					</cfif>
+
+					<cfif not fileExists( getBundle() & "assetfiles.zip" )>
+						<cfset destDir = variables.configBean.getValue('assetdir') & '/' & filePoolID />
+						<cfzip file="#zipPath#" action="unzip" overwrite="false" destination="#destDir#" entrypath="assets">
+						<!---<cfset variables.zipTool.Extract(zipFilePath="#zipPath#",extractPath=destDir, overwriteFiles=true, extractDirs="assets")>--->
 					</cfif>
 				</cfif>
-				<cfif hasAssetsZip>
+				<cfif fileExists( getBundle() & "assetfiles.zip" )>
 					<cfset zipPath = getBundle() & "assetfiles.zip" />
 					<cfset destDir = variables.configBean.getValue('assetdir') & '/' & filePoolID />
-					<cfzip file="#zipPath#" action="list" name="rsfiles">
-					<cfloop query="rsfiles">
-						<cfset filename=variables.fileWriter.pathFormat(rsfiles.name)>
-						<cfif fileExists(destDir & "/" & filename)>
-							<cfset fileDelete(destDir & "/" & filename)>
-						</cfif>
-						<cfzip file="#zipPath#" action="unzip" overwrite="false" destination="#destDir#" entrypath="#rsfiles.directory#" filter="#listLast(filename,'/')#">
-					</cfloop>
+					<cfzip file="#zipPath#" action="unzip" overwrite="false" destination="#destDir#">
+					<!---<cfset variables.zipTool.Extract(zipFilePath="#zipPath#",extractPath=destDir, overwriteFiles=true)>--->
 				</cfif>
-				<cfif hasFilesZip>
+				<cfif fileExists( getBundle() & "filefiles.zip" )>
 					<cfset zipPath = getBundle() & "filefiles.zip" />
 					<cfset destDir = variables.configBean.getValue('filedir') & '/' & filePoolID />
-					<cfzip file="#zipPath#" action="list" name="rsfiles">
-					<cfloop query="rsfiles">
-						<cfset filename=variables.fileWriter.pathFormat(rsfiles.name)>
-						<cfif fileExists(destDir & "/" & filename)>
-							<cfset fileDelete(destDir & "/" & filename)>
-						</cfif>
-						<cfzip file="#zipPath#" action="unzip" overwrite="false" destination="#destDir#" entrypath="#rsfiles.directory#" filter="#listLast(filename,'/')#">
-					</cfloop>
+					<cfzip file="#zipPath#" action="unzip" overwrite="false" destination="#destDir#">
+					<!---<cfset variables.zipTool.Extract(zipFilePath="#zipPath#",extractPath=destDir, overwriteFiles=true)>--->
 				</cfif>
 			</cfif>
 			<cfif arguments.renderingMode eq "all">
 				<cfset zipPath = getBundle() & "sitefiles.zip" />
-				
-				<cfzip file="#zipPath#" action="list" name="rsfiles">
-
-				<cfloop query="rsfiles">
-					<cfset filename=variables.fileWriter.pathFormat(rsfiles.name)>
-					<cfif not listFindNoCase('cache,assets',listFirst(filename,"/"))>
-						<cfif fileExists(siteRoot & "/" & filename)>
-							<cfset fileDelete(siteRoot & "/" & filename)>
-						</cfif>
-						<cfzip file="#zipPath#" action="unzip" overwrite="false" destination="#siteRoot#" entrypath="#rsfiles.directory#" filter="#listLast(filename,'/')#">
-					</cfif>
-				</cfloop>
-				
-				<!---<cfset variables.zipTool.Extract(zipFilePath="#zipPath#",extractPath=siteRoot, overwriteFiles=true, excludeDirs="cache|assets")>--->
+				<!---
+				This still uses zip utility to avoid 
+				https://luceeserver.atlassian.net/browse/LDEV-2660
+				--->
+				<cfset variables.zipTool.Extract(zipFilePath="#zipPath#",extractPath=siteRoot, overwriteFiles=true, excludeDirs="cache|assets")>
 			<cfelseif arguments.renderingMode eq "theme" and len(arguments.themeDir)>
 				<cfset zipPath = getBundle() & "sitefiles.zip" />
-
+				<!---
+				This still uses zip utility to avoid 
+				https://luceeserver.atlassian.net/browse/LDEV-2660
+				--->
 				<cfzip file="#zipPath#" action="unzip" overwrite="true" destination="#siteRoot#" entrypath="includes/themes/#arguments.themeDir#">
 				<cfzip file="#zipPath#" action="unzip" overwrite="true" destination="#siteRoot#" entrypath="themes/#arguments.themeDir#">
-	
+				--->
+				<cfset variables.zipTool.Extract(zipFilePath="#zipPath#",extractPath=siteRoot, overwriteFiles=true, extractDirs="includes/themes/#arguments.themeDir#")>
+				<cfset variables.zipTool.Extract(zipFilePath="#zipPath#",extractPath=siteRoot, overwriteFiles=true, extractDirs="themes/#arguments.themeDir#")>
 			</cfif>
 		</cfif>
 
@@ -717,8 +682,12 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 				<cfset variables.fileWriter.createDir(directory=getBundle() & "plugins")>
 			</cfif>
 
-			<cfzip file="#getBundle()#pluginfiles.zip" action="unzip" overwrite="true" destination="#getBundle()#plugins">
-			<!---<cfset variables.zipTool.Extract(zipFilePath=getBundle() & "pluginfiles.zip",extractPath=getBundle() & "plugins", overwriteFiles=true)>--->
+			<!---<cfzip file="#getBundle()#pluginfiles.zip" action="unzip" overwrite="true" destination="#getBundle()#plugins">
+			This still uses zip utility to avoid 
+			https://luceeserver.atlassian.net/browse/LDEV-2660
+			You typically don't deploy plugins to s3 so native file system is ok
+			--->
+			<cfset variables.zipTool.Extract(zipFilePath=getBundle() & "pluginfiles.zip",extractPath=getBundle() & "plugins", overwriteFiles=true)>
 
 			<cfloop query="rstplugins">
 
