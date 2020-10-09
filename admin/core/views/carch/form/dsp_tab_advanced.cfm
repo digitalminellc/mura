@@ -126,7 +126,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	        </div>
 	</cfif>
 
-	<cfif application.settingsManager.getSite(rc.siteid).getCache() and rc.type eq 'Component' or rc.type eq 'Form'>
+	<cfif rc.type eq 'Component' or rc.type eq 'Form'>
 		<div class="mura-control-group">
 			<label>#application.rbFactory.getKeyValue(session.rb,'sitemanager.content.fields.docachelabel')#</label>
       		<label for="cacheItem" class="checkbox">
