@@ -887,6 +887,8 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 				if(isDefined('#params.method#')){
 
+					getBean('$').init(structCopy(params)).announceEvent('onApiRequest');
+					
 					result=evaluate('#params.method#(argumentCollection=params)');
 
 					if(!isJson(result)){
@@ -984,6 +986,8 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			if(!isDefined('params.entityName')){
 				throw(type="invalidParameters");
 			}
+			
+			getBean('$').init(structCopy(params)).announceEvent('onApiRequest');
 
 			if (params.entityName == 'site'){
 				params.id=params.siteid;
