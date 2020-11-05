@@ -503,8 +503,8 @@ component extends="mura.cfobject" output="false" hint="This provides core bean f
 								checkfound=true;
 							}
 						} while (!checkfound);
+						checknum = checknum + 1;
 					}
-
 				}
 			}
 		}
