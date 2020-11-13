@@ -278,7 +278,7 @@
 												temp.push(hiddenCalendars[i])
 											}
 										}
-										hiddenCalendars=temp;;
+										hiddenCalendars=temp;
 									} else {
 										swatch.css('background-color','');
 										$('##mura-calendar').fullCalendar('removeEventSource',eventSources[self.data('index')]);
