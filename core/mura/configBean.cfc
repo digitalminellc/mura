@@ -2095,17 +2095,14 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 </cffunction>
 
 <cffunction name="getVersionFromFile" output="false">
-	<cfif fileExists(expandPath('/muraWRM/box.json'))>
-		<cfset var boxConfig=fileRead(expandPath('/muraWRM/box.json'))>
-
-		<cfif isJSON(boxConfig)>
-			<cfset boxConfig=deserializeJSON(boxConfig)>
-			<cfif isDefined('boxConfig.version')>
-				<cfreturn boxConfig.version>
-			</cfif>
+	<cfif fileExists(expandPath('/muraWRM/core/version.cfm'))>
+		<cfset var version=trim(fileRead(expandPath('/muraWRM/core/version.cfm')))>
+	
+		<cfif len(version)>
+			<cfreturn version>
 		</cfif>
 	</cfif>
-
+	
 	<cfreturn variables.instance.version>
 </cffunction>
 
