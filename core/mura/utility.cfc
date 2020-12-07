@@ -362,9 +362,9 @@
 	<cfset var headers=getHttpRequestData().headers>
 
 	<cfif StructKeyExists(headers,"X-Forwarded-Host") and len(headers["X-Forwarded-Host"])>
-		<cfreturn headers["X-Forwarded-Host"]>
+		<cfreturn listFirst(headers["X-Forwarded-Host"],":")>
 	<cfelseif len(cgi.http_host)>
-		<cfreturn cgi.http_host>
+		<cfreturn listFirst(cgi.http_host,":")>
 	<cfelse>
 		<cfreturn cgi.server_name>
 	</cfif>
