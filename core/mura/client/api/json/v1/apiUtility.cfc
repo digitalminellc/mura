@@ -377,24 +377,22 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 			getBean('utility').suppressDebugging();
 
-			var headers = getHttpRequestData().headers;
-			
-			if(structKeyExists(httpRequestData.headers,'Origin')){
-				var PC = getpagecontext().getresponse();
+			var httpRequestData=getHTTPRequestData();
+			var headers = httpRequestData.headers;
 
-				if(application.configBean.getValue(property="cors",defaultValue=true)){
-					var origin = httpRequestData.headers['Origin'];
+			if( structKeyExists( headers, 'Origin' )){
+				if(getBean('configBean').getValue(property="cors",defaultValue=true)){
+					var origin =  headers['Origin'];
 					var originDomain =reReplace(origin, "^\w+://([^\/:]+)[\w\W]*$", "\1", "one");
-
+			
 					// If the Origin is okay, then echo it back, otherwise leave out the header key
 					for(var domain in application.settingsManager.getAccessControlOriginDomainArray() ){
 						if( domain == originDomain || len(originDomain) > len(domain) && right(originDomain,len(domain)+1)=='.' & domain ){
-							PC.setHeader( 'Access-Control-Allow-Origin', origin );
+							responseObject.setHeader( 'Access-Control-Allow-Origin', origin );
 						}
 					}
 				}
-
-				PC.setHeader( 'Access-Control-Allow-Credentials', 'true' );
+				responseObject.setHeader( 'Access-Control-Allow-Credentials', 'true' );
 			}
 
 			var paramsArray=[];
