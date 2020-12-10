@@ -378,20 +378,24 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			getBean('utility').suppressDebugging();
 
 			var headers = getHttpRequestData().headers;
+			
+			if(structKeyExists(httpRequestData.headers,'Origin')){
+				var PC = getpagecontext().getresponse();
 
-			if( structKeyExists( headers, 'Origin' )){
-
-			  	var origin =  headers['Origin'];
+				if(application.configBean.getValue(property="cors",defaultValue=true)){
+					var origin = httpRequestData.headers['Origin'];
 					var originDomain =reReplace(origin, "^\w+://([^\/:]+)[\w\W]*$", "\1", "one");
 
-			  	// If the Origin is okay, then echo it back, otherwise leave out the header key
+					// If the Origin is okay, then echo it back, otherwise leave out the header key
 					for(var domain in application.settingsManager.getAccessControlOriginDomainArray() ){
 						if( domain == originDomain || len(originDomain) > len(domain) && right(originDomain,len(domain)+1)=='.' & domain ){
-							responseObject.setHeader( 'Access-Control-Allow-Origin', origin );
-				   		responseObject.setHeader( 'Access-Control-Allow-Credentials', 'true' );
+							PC.setHeader( 'Access-Control-Allow-Origin', origin );
 						}
 					}
-		  	}
+				}
+
+				PC.setHeader( 'Access-Control-Allow-Credentials', 'true' );
+			}
 
 			var paramsArray=[];
 			var pathInfo=listToArray(arguments.path,'/');
