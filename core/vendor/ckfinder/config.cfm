@@ -272,7 +272,7 @@ config.checkSizeAfterScaling = true ;
 /* For security, HTML is allowed in the first Kb of data for files having the
  * following extensions only.
  */
-config.htmlExtensions = 'html,htm,xml,js,cfm,cfc' ;
+config.htmlExtensions = 'html,htm,xml,js,cfm,cfc,svg' ;
 
 /*
 Folders to not display in CKFinder, no matter their location.
