@@ -1114,7 +1114,7 @@ function openFileMetaData(contenthistid,fileid,siteid,property) {
 
 	    	//if(tab.toLowerCase() != 'upload'){
 			$elm.find(".mura-file-option").find('input').val('');
-			$elm.find(".mura-file-option").find('.btn').hide();
+			$elm.find(".mura-file-option").find(".btn:not('.btn-file')").hide();
 			//}
 
 	    	$elm.find(".mura-file-option").hide();
@@ -1157,6 +1157,35 @@ function openFileMetaData(contenthistid,fileid,siteid,property) {
 	  }
 
 	  $.fn.fileselector.Constructor = FileSelector;
+
+	  // Handlers
+	$.fn.handlers = function() {
+		var $parent = this;
+		return {
+			preview: function(loading) {
+				return $parent.each(function() {
+					if (loading) {
+						$(this).hide().parent().find('.help-block-empty').hide()
+					} else if(this.isLoaded()) {
+						$(this).show().parent().find('.help-block-empty').hide()
+					} else {
+						$(this).hide().parent().find('.help-block-empty').show();
+					}
+					return $(this);
+				})
+			},
+			loading: function(loading) {
+				return $parent.each(function() {
+					if(!loading) {
+						$(this).show().parent().find('.image-preview.load-inline').hide().spin(false)
+					} else {
+						$(this).hide().parent().find('.image-preview.load-inline').show().spin(spinnerArgs2)
+					}
+					return $(this);
+				})
+			}
+		}
+	}
 
 }(window.jQuery));
 
