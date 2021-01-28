@@ -65,7 +65,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 <cfoutput>
 
 <div class="mura-control-group">
-		<div class="mura-input-set">
+		<div class="mura-input-set assocFilterControls">
 			<input class="filesearch mura-3 mura-constrain" value="#esapiEncode('html_attr',rc.keywords)#" type="text" maxlength="50" placeholder="#esapiEncode('html_attr',application.rbFactory.getKeyValue(session.rb,'sitemanager.content.fields.searchforexistingfiles'))#" />
 			<button type="button" class="btn"><i class="mi-search"></i></button>
 		</div>

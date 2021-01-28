@@ -565,11 +565,13 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	<cfargument name="scope" default="#form#">
 	<cfargument name="allowedExtensions" default="#getBean('configBean').getFMAllowedExtensions()#">
 	<cfscript>
-		var tempext='';
+		var temptext='';
 		var classExtensionManager=getBean('configBean').getClassExtensionManager();
-
+		var allowedImageExtensions=getBean('configBean').getAllowedImageExtensions();
+		var maxUploadFileSize=application.configBean.getValue('maxuploadfilesize');
+		
 		if(!len(arguments.allowedExtensions)){
-			return false;
+			return 0;
 		}
 
 		if(structKeyExists(arguments.scope,'siteid')){
@@ -577,62 +579,73 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 		} else {
 			var siteid=getSession().siteid;
 		}
-
+		
 		if(isdefined('arguments.scope.type') && arguments.scope.type=='Link'){
 			arguments.scope=structCopy(arguments.scope);
 			structDelete(arguments.scope,'body');
 		}
-
+		
 		for (var i in arguments.scope){
 			if(structKeyExists(arguments.scope,'#i#') && isSimpleValue(arguments.scope['#i#']) ){
 				if(isPostedFile(i)){
-
+					
 					temptext=listLast(getPostedClientFileName(i),'.');
-
+					
 					if(len(tempText) && len(tempText) < 5 && !listFindNoCase(arguments.allowedExtensions,temptext)){
-						return true;
+						return 1;
+					}
+					
+					//if image type
+					if (listFindNoCase(allowedImageExtensions, temptext)){
+						
+						var path = listLast(arguments.scope['#i#'],',');
+						temptext = getFileInfo(path).size;
+						if (temptext > maxUploadFileSize){
+							temptext = numberFormat(temptext / 1024,'9');
+							return "2|#temptext#kb";
+						}
 					}
 				}
-
+				
 				if(isValid('url',arguments.scope['#i#']) && right(arguments.scope['#i#'],1) != '/'){
-
+					
 					if(i neq 'newfile' && !classExtensionManager.isFileAttribute(i,siteid)){
 						break;
 					}
-
+					
 					tempText=arguments.scope['#i#'];
-
+					
 					//if it contains a protocol
 					if(reFindNoCase("(https://||http://)", tempText)){
-
+						
 						//strip it out
 						tempText=reReplaceNoCase(tempText, "(http://||https://)", "");
-
+						
 						//and then on continue if the url contains a list longer than one
 						if(listLen(tempText,'/') ==1) {
 							break;
 						}
 					}
-
+					
 					tempText=listFirst(arguments.scope['#i#'],'?');
 					tempText=listLast(tempText,'/');
 					tempText=listLast(tempText,'.');
-
+					
 					/*
 					if(i=='body'){
 						writeDump(var=tempText,abort=1);
 					}
 					*/
-
+					
 					if(len(tempText) < 5 && !listFindNoCase(arguments.allowedExtensions,temptext)){
-						return true;
+						return 1;
 					}
 				}
-
+				
 			}
 		}
-
-		return false;
+		
+		return 0;
 	</cfscript>
 </cffunction>
 

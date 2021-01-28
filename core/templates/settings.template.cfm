@@ -117,3 +117,4 @@ usedefaultsmtpserver=true
 usefilemode=false
 variations=false
 windowdocumentdomain=
+maxuploadfilesize=10485760
