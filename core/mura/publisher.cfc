@@ -112,7 +112,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 		<cfif NOT hasStructuredAssets>			
 			<cfset arguments.keyMode = "publish">
 		</cfif>
-		
+
 		<cfsetting requestTimeout = "7200">
 
 		<cfif structKeyExists(arguments,"Bundle")>

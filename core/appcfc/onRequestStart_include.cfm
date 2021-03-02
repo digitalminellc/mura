@@ -92,7 +92,7 @@ if ( isDefined("onApplicationStart") ) {
 				)
 		)
 	) ) {
-		lock name="appInitBlock#application.instanceID#" type="exclusive" timeout="200" {
+		lock name="appInitBlock#application.instanceID#" type="exclusive" timeout="600" {
 			if(!(isDefined('url.method') && url.method == 'processAsyncObject')){
 			//  Since the request may have had to wait twice, this code still needs to run
 				if ( (not application.appInitialized || structKeyExists(url,application.appReloadKey)) ) {
