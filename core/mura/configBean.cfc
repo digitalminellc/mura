@@ -853,12 +853,6 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	<cfreturn this>
 </cffunction>
 
-<!---
-<cffunction name="createGUID" output="false">
-   <cfreturn insert("-", CreateUUID(), 23) />
-</cffunction>
---->
-
 <cffunction name="loadClassExtensionManager" output="false">
 	<cfset variables.instance.extensionManager=createObject("component","mura.extend.extendManager").init(this) />
 	<cfreturn this>
