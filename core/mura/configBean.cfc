@@ -201,6 +201,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 <cfset variables.instance.suppressAPIParams=true>
 <cfset variables.instance.sessionBasedLockdown=true>
 <cfset variables.instance.autoPurgeOutputCache=true>
+<cfset variables.instance.AllowedImageExtensions="png,jpg,jpeg,gif,webp">
 
 <cffunction name="OnMissingMethod" output="false" hint="Handles missing method exceptions.">
 <cfargument name="MissingMethodName" type="string" required="true" hint="The name of the missing method." />
@@ -851,12 +852,6 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	</cfif>
 	<cfreturn this>
 </cffunction>
-
-<!---
-<cffunction name="createGUID" output="false">
-   <cfreturn insert("-", CreateUUID(), 23) />
-</cffunction>
---->
 
 <cffunction name="loadClassExtensionManager" output="false">
 	<cfset variables.instance.extensionManager=createObject("component","mura.extend.extendManager").init(this) />
