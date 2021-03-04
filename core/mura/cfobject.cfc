@@ -463,4 +463,8 @@ component output="false" hint="This provides base functionality to all Mura core
 		}
 	}
 
+	function logText(text,file='application'){
+		writeLog(type="information",file=arguments.file,text=arguments.text);
+	}
+
 }
