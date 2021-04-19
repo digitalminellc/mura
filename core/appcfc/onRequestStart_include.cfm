@@ -304,8 +304,9 @@ if(local.HSTSMaxAge){
 		.setHeader('Strict-Transport-Security', 'max-age=#application.configBean.getValue(property='HSTSMaxAge',defaultValue=1200)#');
 }
 
+if(application.configBean.getValue(property='generatorheader',defaultValue=true)){
 	getPageContext()
 		.getResponse()
-		.setHeader('Generator', 'Mura CMS #application.serviceFactory.getBean('configBean').getVersion()#');
-
+		.setHeader('Generator', 'Mura #application.serviceFactory.getBean('configBean').getVersion()#');
+}
 </cfscript>
