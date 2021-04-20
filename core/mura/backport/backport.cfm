@@ -1,6 +1,14 @@
 <cfscript>
 request.backported=true;
 
+if(!isdefined('backportdir')){
+	if(server.coldfusion.productname != 'Coldfusion Server'){
+		backportdir='';
+	} else {
+		backportdir='/mura/backport/';	
+	}
+}
+
 if(!structKeyExists(request,'backports')){
 	request.backports={};
 }
@@ -15,13 +23,6 @@ if(!structKeyExists(request.backports,'esapiencode')){
 }
 
 if(request.backports.esapiencode){
-	if(!isdefined('backportdir')){
-		if(server.coldfusion.productname != 'Coldfusion Server'){
-			backportdir='';
-		} else {
-			backportdir='/mura/backport/';	
-		}
-	}
 	include '#backportdir#esapiencode.cfm';
 }
 
