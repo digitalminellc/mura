@@ -120,6 +120,14 @@ if ( !request.muraTemplateMissing ) {
 			}
 		} catch (any cfcatch) {
 		}
+	} else {
+		var jvmProps=createObject('java','java.lang.System').getProperties();
+
+		if(structKeyExsts(jvmProps,'MURA_ERRORTEMPLATE')){
+			include jvmProps['MURA_ERRORTEMPLATE'];
+			abort;
+		}
+
 	}
 	try {
 		if(isDefined('application.serviceFactory')){
