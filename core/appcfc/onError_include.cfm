@@ -122,12 +122,14 @@ if ( !request.muraTemplateMissing ) {
 		}
 	} else {
 		var jvmProps=createObject('java','java.lang.System').getProperties();
-
+		cfcontent(reset="true");
+		cfheader(statustext="An Error Occurred", statuscode=500);
 		if(structKeyExsts(jvmProps,'MURA_ERRORTEMPLATE')){
 			include jvmProps['MURA_ERRORTEMPLATE'];
-			abort;
+		}else {
+			include "/muraWRM/core/templates/error.html";
 		}
-
+		abort;
 	}
 	try {
 		if(isDefined('application.serviceFactory')){
