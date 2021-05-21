@@ -124,7 +124,7 @@ if ( !request.muraTemplateMissing ) {
 		var jvmProps=createObject('java','java.lang.System').getProperties();
 		cfcontent(reset="true");
 		cfheader(statustext="An Error Occurred", statuscode=500);
-		if(structKeyExsts(jvmProps,'MURA_ERRORTEMPLATE')){
+		if(structKeyExists(jvmProps,'MURA_ERRORTEMPLATE')){
 			include jvmProps['MURA_ERRORTEMPLATE'];
 		}else {
 			include "/muraWRM/core/templates/error.html";
