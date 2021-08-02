@@ -1702,7 +1702,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	WHERE
 
 	<cfif arguments.searchType eq "image">
-	tfiles.fileext in ('png','gif','jpg','jpeg') AND
+	tfiles.fileext in ('png','gif','jpg','jpeg','svg') AND
 	</cfif>
 
 	<cfif kw neq '' or arguments.tag neq ''>
@@ -1809,7 +1809,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 		WHERE
 
 		<cfif arguments.searchType eq "image">
-			tfiles.fileext in ('png','gif','jpg','jpeg') AND
+			tfiles.fileext in ('png','gif','jpg','jpeg','svg') AND
 		</cfif>
 
 		tcontent.Active = 1
