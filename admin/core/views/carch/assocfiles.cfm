@@ -99,9 +99,9 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 								<cfset counter=counter+1/>
 						        <li>
 						        <cfif hasImage>
-						        <img src="#$.getURLForImage(fileid=rsimages.fileid,size='small',siteid=rc.siteid,fileext=rsimages.fileExt,useProtocol=false)#?v=#createUUID()#"/><br/>
+									<img src="#$.getURLForImage(fileid=rsimages.fileid,size='small',siteid=rc.siteid,fileext=rsimages.fileExt,useProtocol=false)#?v=#createUUID()#"<cfif lcase(rsimages.fileExt) is "svg"> style="width:#$.siteConfig('smallImageWidth')#<cfif isNumeric($.siteConfig('smallImageWidth'))>px</cfif>;height:#$.siteConfig('smallImageHeight')#<cfif isNumeric($.siteConfig('smallImageWidth'))>px</cfif>;"</cfif>/><<br/>
 						        <cfelse>
-						        <i class="mi-file-text-o"></i><br/>#rsimages.assocfilename#<br>
+						        	<i class="mi-file-text-o"></i><br/>#rsimages.assocfilename#<br>
 						        </cfif>
 						        <input type="radio" name="#esapiEncode('html_attr',rc.property)#" value="#rsimages.fileid#"/></li>
 						 	</cfif>
