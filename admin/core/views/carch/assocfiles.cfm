@@ -99,7 +99,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 								<cfset counter=counter+1/>
 						        <li>
 						        <cfif hasImage>
-						        <img src="#$.getURLForImage(fileid=rsimages.fileid,size='small',siteid=rsimages.siteid,fileext=rsimages.fileExt,useProtocol=false)#?v=#createUUID()#"/><br/>
+						        <img src="#$.getURLForImage(fileid=rsimages.fileid,size='small',siteid=rc.siteid,fileext=rsimages.fileExt,useProtocol=false)#?v=#createUUID()#"/><br/>
 						        <cfelse>
 						        <i class="mi-file-text-o"></i><br/>#rsimages.assocfilename#<br>
 						        </cfif>
