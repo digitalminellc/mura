@@ -80,13 +80,13 @@ component extends="mura.cfobject" output="false" hint="This is used by advanced 
 
 		if(arguments.timespan eq ""){
 			arguments.timespan=CreateTimeSpan(1,0,0,0);
-		} else if (arguments.timespan < 1000){
+		} else if (arguments.timespan < 1000 AND !isDate(arguments.timespan)){
 			arguments.timespan=CreateTimeSpan(arguments.timespan,0,0,0);
 		}
 
 		if(arguments.idleTime eq ""){
 			arguments.idleTime=CreateTimeSpan(1,0,0,0);
-		} else if (arguments.idleTime < 1000){
+		} else if (arguments.idleTime < 1000 AND !isDate(arguments.idleTime)){
 			arguments.idleTime=CreateTimeSpan(arguments.idleTime,0,0,0);
 		}
 
