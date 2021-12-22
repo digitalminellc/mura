@@ -43,11 +43,24 @@
 	version 2 without this exception.  You may, if you choose, apply this exception to your own modified versions of Mura CMS.
 --->
 <cfoutput>
-
+	<cfswitch expression="#rc.usertype#" >
+		<cfcase value="1">
+			<cfset searchHeader = replaceNoCase(rbKey('user.usersearchresults'),'User','Group','ALL')>
+			<cfset membersTab = rbKey('user.membergroups')>
+			<cfset systemsTab = rbKey('user.adminusergroups')>
+			<cfset includeFile = "inc/dsp_groups_list.cfm">
+		</cfcase>
+		<cfdefaultcase>
+			<cfset searchHeader = rbKey('user.usersearchresults')>
+			<cfset membersTab = rbKey('user.sitemembers')>
+			<cfset systemsTab = rbKey('user.systemusers')>
+			<cfset includeFile = "inc/dsp_users_list.cfm">
+		</cfdefaultcase>
+	</cfswitch>
 
 	<!--- Page Title --->
 <div class="mura-header">
-	<h1>#rbKey('user.usersearchresults')#</h1>
+	<h1>#searchHeader#</h1>
 
 	<!--- Buttons --->
 		<div class="nav-module-specific btn-group">
@@ -95,18 +108,18 @@
       <ul class="mura-tab-links nav-tabs">
 
         <!--- Site Members Tab --->
-          <li<cfif rc.ispublic eq 1> class="active"</cfif>>
-            <a href="#buildURL(action='cusers.search', querystring='siteid=#esapiEncode('url',rc.siteid)#&ispublic=1&search=#esapiEncode('url',rc.search)#')#">
-              #rbKey('user.sitemembers')#
-            </a>
-          </li>
+			<li<cfif rc.ispublic eq 1> class="active"</cfif>>
+			<a href="#buildURL(action='cusers.search', querystring='siteid=#esapiEncode('url',rc.siteid)#&ispublic=1&usertype=#esapiEncode('url',rc.usertype)#&search=#esapiEncode('url',rc.search)#')#">
+			#membersTab#
+			</a>
+		</li>
 
         <!--- System Users Tab --->
-          <li<cfif rc.ispublic eq 0> class="active"</cfif>>
-            <a href="#buildURL(action='cusers.search', querystring='siteid=#esapiEncode('url',rc.siteid)#&ispublic=0&search=#esapiEncode('url',rc.search)#')#">
-              #rbKey('user.systemusers')#
-            </a>
-          </li>
+			<li<cfif rc.ispublic eq 0> class="active"</cfif>>
+			<a href="#buildURL(action='cusers.search', querystring='siteid=#esapiEncode('url',rc.siteid)#&ispublic=0&usertype=#esapiEncode('url',rc.usertype)#&search=#esapiEncode('url',rc.search)#')#">
+			#systemsTab#
+			</a>
+		</li>
 
       </ul>
 			<div class="block-content tab-content">
@@ -116,11 +129,11 @@
 				<div class="block block-bordered">
 					<!-- block header -->					
 					<div class="block-header">
-						<h3 class="block-title"><cfif rc.ispublic eq 1>#rbKey('user.sitemembers')#<cfelse>#rbKey('user.systemusers')#</cfif></h3>
+						<h3 class="block-title"><cfif rc.ispublic eq 1>#membersTab#<cfelse>#systemsTab#</cfif></h3>
 					</div> <!-- /.block header -->						
 					<div class="block-content">
 						  	
-						<cfinclude template="inc/dsp_users_list.cfm" />
+						<cfinclude template="#includeFile#" />
 
 					</div> <!-- /.block-content -->
 				</div> <!-- /.block-bordered -->
@@ -130,8 +143,8 @@
   <cfelse>
 		<div class="block block-bordered">
 		  <div class="block-content">
-		    <h3>#rbKey('user.sitemembers')#</h3>
-				<cfinclude template="inc/dsp_users_list.cfm" />
+		    <h3>#membersTab#</h3>
+				<cfinclude template="#includeFile#" />
 			</div> <!-- /.block-content -->
 		</div> <!-- /.block-bordered -->
   </cfif>
