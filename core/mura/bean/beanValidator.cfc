@@ -339,7 +339,8 @@ component output="false" accessors="true" extends="mura.cfobject" hint="This pro
 	}
 
 	public boolean function validate_method(required any object, required string propertyIdentifier, required string constraintValue) {
-		return arguments.object.invokeMethod(arguments.constraintValue);
+		// not safe for public validation
+		//return arguments.object.invokeMethod(arguments.constraintValue);
 	}
 
 	public boolean function validate_lte(required any object, required string propertyIdentifier, required string constraintValue) {
