@@ -51,6 +51,29 @@ component extends="mura.bean.beanORM" table='tfiles' entityName="file" hint="Thi
 		}
 	}
 
+	function validate(fields=''){
+		super.validate(fields=arguments.fields);
+		
+		var restrictedFilesArray=[];
+		var filesize=0;
+		var hasRestrictedFiles=getBean('fileManager').requestHasRestrictedFiles(scope=getAllValues());
+		
+		if(len(hasRestrictedFiles) > 1 && findNoCase('|',hasRestrictedFiles)){
+			restrictedFilesArray=listToArray(hasRestrictedFiles, '|');
+			hasRestrictedFiles=restrictedFilesArray[1];
+			fileSize=restrictedFilesArray[2];
+		}
+		if(hasRestrictedFiles == '1'){
+			errors=getErrors();
+			errors.requestHasRestrictedFiles=getBean('settingsManager').getSite(getValue('siteid')).getRBFactory().getKey('sitemanager.requestHasRestrictedFiles');
+		} else if(hasRestrictedFiles == '2'){
+			errors=getErrors();
+			errors.requestHasRestrictedFiles=getBean('settingsManager').getSite(getValue('siteid')).getRBFactory().getKey('sitemanager.requestHasInvalidSize') & fileSize;
+		}
+		
+		return this;
+	}
+
 	function save(processFile=true){
 		if(arguments.processFile && len(getValue('fileField')) && len(getValue(getValue('fileField')))){
 			setValue('fileID',createUUID());
