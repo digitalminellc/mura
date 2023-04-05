@@ -939,7 +939,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 						throw(type="invalidMethodCall");
 					}
 
-					result=invoke(this,params.method,params);
+					var result=invoke(this,params.method,params);
 
 					if(!isJson(result)){
 						result=serializeResponse(statusCode=200,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'data'=result});
