@@ -892,7 +892,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 					getBean('$').init(structCopy(params)).announceEvent('onApiRequest');
 					
-					result=evaluate('#params.method#(argumentCollection=params)');
+					var result=invoke(this,params.method,params);
 
 					if(!isJson(result)){
 						result=serializeResponse(statusCode=200,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'data'=result});
@@ -935,11 +935,11 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 						parseParamsFromPath(pathInfo,params,3);
 					}
 
-					if(!listFindNoCase(variables.config.publicMethods, params.method) ){
+					if(!listFindNoCase(variables.config.publicMethods, params.method)){
 						throw(type="invalidMethodCall");
 					}
 
-					result=evaluate('#params.method#(argumentCollection=params)');
+					result=invoke(this,params.method,params);
 
 					if(!isJson(result)){
 						result=serializeResponse(statusCode=200,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'data'=result});
@@ -1087,11 +1087,12 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 								entity.loadBy(argumentCollection=loadByArgs);
 
 								structDelete(params,'id');
+								
+								var result=invoke(entity,pathInfo[4],params);
 
-								var result=evaluate('entity.#pathInfo[4]#(argumentCollection=params)');
 								return serializeResponse(statusCode=200,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'data'=result});
 
-							} else if(isDefined('application.objectmappings.#params.entityName#.properties.#pathInfo[4]#')
+							} else if(isValid('variableName',pathInfo[4]) && isDefined('application.objectmappings.#params.entityName#.properties.#pathInfo[4]#')
 							&& structKeyExists(application.objectmappings[params.entityName].properties[pathInfo[4]],'cfc') ){
 								var relationship=application.objectmappings[params.entityName].properties[pathInfo[4]];
 
@@ -1173,7 +1174,8 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 						url.method=pathInfo[3];
 
 						var entity=getBean(params.entityName);
-						var result=evaluate('entity.#pathInfo[3]#(argumentCollection=params)');
+						var result=invoke(entity,pathInfo[3],params);
+					
 						return serializeResponse(statusCode=200,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'data'=result});
 					} else if (params.entityName=='content') {
 						params.id=pathInfo[3];
@@ -1450,7 +1452,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 				structDelete(params,'id');
 
-				return evaluate('entity.#arguments.method#(argumentCollection=params)');	
+				return invoke(entity,arguments.method,arguments.params);
 			} else if (arguments.throwError){
 				throw(type="invalidMethodCall");
 			} else {
@@ -3453,7 +3455,13 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 			if(arrayLen(variables.config.linkMethods)){
 				for(var i in variables.config.linkMethods){
-					evaluate('#i#(entity=arguments.entity,links=links)');
+					if(isValid('variableName',i) && isDefined(i)){
+						var params={
+							entity=arguments.entity,
+							links=links
+						};
+						invoke(this,i,params);
+					}
 				}
 			}
 		}
