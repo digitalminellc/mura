@@ -869,9 +869,6 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			}
 
 			if (isDefined('params.method') && isDefined('#params.method#')){
-				if(!listFindNoCase(variables.config.publicMethods, params.method) ){
-					throw(type="invalidMethodCall");
-				}
 
 				if(!(listFindNoCase('validate,processAsyncObject,generateCSRFTokens',params.method) || apiEnabled)){
 					throw(type='disabled');
@@ -879,6 +876,10 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 				if(arrayLen(pathInfo) > 1){
 					parseParamsFromPath(pathInfo,params,2);
+				}
+
+				if(!listFindNoCase(variables.config.publicMethods, params.method) ){
+					throw(type="invalidMethodCall");
 				}
 
 				param name="params.siteid" default=variables.siteid;
@@ -926,16 +927,16 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 				if(isDefined(pathInfo[2]) && pathInfo[2] != 'file'){
 					params.method=pathInfo[2];
 
-					if(!listFindNoCase(variables.config.publicMethods, params.method) ){
-						throw(type="invalidMethodCall");
-					}
-
 					if(!(listFindNoCase('validate,processAsyncObject',params.method) || apiEnabled)){
 						throw(type='disabled');
 					}
 
 					if(arrayLen(pathInfo) > 2){
 						parseParamsFromPath(pathInfo,params,3);
+					}
+
+					if(!listFindNoCase(variables.config.publicMethods, params.method) ){
+						throw(type="invalidMethodCall");
 					}
 
 					result=evaluate('#params.method#(argumentCollection=params)');
@@ -1642,15 +1643,11 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 		}
 
 		for(var i=1;i<=arrayLen(paramsArray);i++){
-			if(paramsArray[i]=='method'){
-				throw(type='invalidParameters');
+			if(i mod 2){
+				params['#paramsArray[i]#']='';
 			} else {
-				if(i mod 2){
-					params['#paramsArray[i]#']='';
-				} else {
-					var previous=i-1;
-					params['#paramsArray[previous]#']=paramsArray[i];
-				}
+				var previous=i-1;
+				params['#paramsArray[previous]#']=paramsArray[i];
 			}
 		}
 
