@@ -1642,13 +1642,19 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 		}
 
 		for(var i=1;i<=arrayLen(paramsArray);i++){
-			if(i mod 2){
-				params['#paramsArray[i]#']='';
+			if(paramsArray[i]=='method'){
+				throw(type='invalidParameters');
 			} else {
-				var previous=i-1;
-				params['#paramsArray[previous]#']=paramsArray[i];
+				if(i mod 2){
+					params['#paramsArray[i]#']='';
+				} else {
+					var previous=i-1;
+					params['#paramsArray[previous]#']=paramsArray[i];
+				}
 			}
 		}
+
+		
 	}
 
 	function getRelationship(from,to){

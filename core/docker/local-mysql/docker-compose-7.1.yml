@@ -3,7 +3,7 @@ version: '2.1'
 services:
   #Mura Server
   mura_mysql_cfml:
-    image: ortussolutions/commandbox:adobe2016
+    image: ortussolutions/commandbox:adobe2018
     depends_on:
       - mura7_1_mysql
     environment:
@@ -36,14 +36,14 @@ services:
 
   #MySQL
   mura7_1_mysql:
-    image: mysql:5.7
+    image: mysql:latest
     environment:
         MYSQL_ROOT_PASSWORD: NOT_SECURE_CHANGE
         MYSQL_DATABASE: muradb
     volumes:
         - mura7_1_mysql_data:/var/lib/mysql
     ports:
-        - "55555:3306"
+        - "55556:3306"
 
 volumes:
     mura7_1_mysql_data:
