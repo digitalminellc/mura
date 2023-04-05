@@ -3459,7 +3459,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 			if(arrayLen(variables.config.linkMethods)){
 				for(var i in variables.config.linkMethods){
-					if(isValid('variableName',i) && isDefined(i)){
+					if(isDefined('#i#') && isValid('variableName',i)){
 						var params={
 							entity=arguments.entity,
 							links=links
