@@ -2665,8 +2665,8 @@ Display Objects
 	<cfset var finder=reFindNoCase(regex1,body,1,"true")>
 	<cfset var tempValue="">
 
-	<cfparam name="this.enableMuraTag" default="true" />
-	<cfparam name="this.enableDynamicContent" default="true" />
+	<cfparam name="this.enableMuraTag" default="false" />
+	<cfparam name="this.enableDynamicContent" default="false" />
 
 	<!--- It the Dyanmic content is not enabled just return the submitted string --->
 	<cfif isBoolean(this.enableDynamicContent) and not this.enableDynamicContent>
