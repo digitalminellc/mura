@@ -21,7 +21,7 @@ services:
       MURA_DATABASE: muradb
       MURA_DBTYPE: mysql
       MURA_DBCONNECTIONSTRING: "jdbc:mysql://mura_mysql:3306/muradb?useUnicode=true&characterEncoding=UTF-8&useLegacyDatetimeCode=true"
-      MURA_DBCLASS: com.mysql.jdbc.Driver
+      MURA_DBCLASS: com.mysql.cj.jdbc.Driver
       MURA_DBUSERNAME: root
       MURA_DBPASSWORD: FROM_ENV
       MURA_DBHOST: mura_mysql
@@ -41,14 +41,14 @@ services:
 
   #MySQL
   mura_mysql:
-    image: mysql:5.7
+    image: mysql:latest
     environment:
         MYSQL_ROOT_PASSWORD: NOT_SECURE_CHANGE
         MYSQL_DATABASE: muradb
     volumes:
         - mura_mysql_data:/var/lib/mysql
     ports:
-        - "55556:3306"
+        - "55557:3306"
 
 volumes:
     mura_mysql_data:

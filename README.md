@@ -53,7 +53,7 @@ Password:admin
 
 ```
 Host: localhost
-Port: 55555
+Port: 55557
 Username: root
 Passsword: NOT_SECURE_CHANGE
 ```
