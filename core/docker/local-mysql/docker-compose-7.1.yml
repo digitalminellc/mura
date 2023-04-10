@@ -43,7 +43,7 @@ services:
     volumes:
         - mura7_1_mysql_data:/var/lib/mysql
     ports:
-        - "55556:3306"
+        - "55557:3306"
 
 volumes:
     mura7_1_mysql_data:
