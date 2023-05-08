@@ -307,6 +307,7 @@
 
 		<!--- Join to implied tables based on field prefix --->
 		<cfloop list="#jointables#" index="jointable">
+			<cfset joinTable=sanitizedValue(jointable)>
 			<cfset started=false>
 
 			<cfif arrayLen(params.getJoins())>
@@ -326,7 +327,7 @@
 		<!--- Join to explicit tables based on join clauses --->
 		<cfloop from="1" to="#arrayLen(local.specifiedjoins)#" index="local.i">
 			<cfif len(local.specifiedjoins[local.i].clause)>
-				#local.specifiedjoins[local.i].jointype# join #local.specifiedjoins[local.i].table# #tableModifier# on (#local.specifiedjoins[local.i].clause#)
+				#sanitizedValue(local.specifiedjoins[local.i].jointype)# join #sanitizedValue(local.specifiedjoins[local.i].table)# #tableModifier# on (#sanitizedValue(local.specifiedjoins[local.i].clause)#)
 			</cfif>
 		</cfloop>
 
@@ -717,7 +718,7 @@
 
 	<cfscript>
 	function sanitizedValue(value) output=false {
-		return REReplace(value,"[^0-9A-Za-z\._,\- ]\*","","all");
+		return REReplace(value,"[^0-9A-Za-z\._,\-\*]","","all");
 	}
 	</cfscript>
 

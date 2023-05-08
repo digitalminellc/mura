@@ -3643,69 +3643,112 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 	}
 
-	function validate(data='{}',validations='{}') {
+	function validate(data='{}',validations='{}',siteid) {
 
-		arguments.data=urlDecode(arguments.data);
+		getBean('utility').excludeFromClientCache();
+		
+		if(isSimpleValue(value=arguments.data)){
+			arguments.data=urlDecode(arguments.data);
 
-		if(isJSON(arguments.data)){
-			arguments.data=deserializeJSON(arguments.data);
-		} else {
-			throw(type="invalidParameters");
+			if(isJSON(arguments.data)){
+				arguments.data=deserializeJSON(arguments.data);
+			} else {
+				throw(type="invalidParameters");
+			}
 		}
 
-		arguments.validations=urlDecode(arguments.validations);
+		if(isSimpleValue(value=arguments.validations)){
+			arguments.validations=urlDecode(arguments.validations);
+		
+			if(isJSON(arguments.validations)){
+				arguments.validations=deserializeJSON(arguments.validations);
+			} else {
+				throw(type="invalidParameters");
+			}
+		} 
 
-		if(isJSON(arguments.validations)){
-			arguments.validations=deserializeJSON(arguments.validations);
-		} else {
-			throw(type="invalidParameters");
-		}
-
-		if(!isStruct(arguments.data)){
+		if(!isStruct(arguments.data) || !isStruct(arguments.validations)){
 			return {invalid='Invalid validation request'};
 		}
 
-		param name="data.fields" default="";
+		param name="arguments.data.fields" default="";
+		param name="arguments.data.siteid" default=arguments.siteid;
+
+		var $=getBean('Mura').init(arguments.data.siteid);
 
 		if(isDefined('data.entityname') && findNoCase('feed',data.entityname)){
 			throw(type="invalidParameters");
 		}
 
-		if(structIsEmpty(arguments.validations) && isDefined('data.entityname') && isDefined('data.siteid')){
+		param name="request.muraValidationContext" default={};
+
+		var validationContextID=createUUID();
+
+		request.muraValidationContext['#validationContextID#']=arguments.data;
+
+		if(isDefined('arguments.data.entityname')){
+
 			var bean=getBean(arguments.data.entityname);
-			var args={'#bean.getPrimaryKey()#'=arguments.data[bean.getPrimaryKey()]
-			};
 
-			return bean.loadBy(argumentCollection=args).set(arguments.data).validate(arguments.data.fields).getErrors();
+			if(!allowAccess(data.entityname,$)){
+				throw(type="authorization");
+			}
 
+			if(data.entityName=='content'){
+				if(!structKeyExists(arguments.data,'contentid')){
+					arguments.data.contentid=createUUID();
+				}
+			}
+
+			if(!structKeyExists(arguments.data,'#bean.getPrimaryKey()#')){
+				arguments.data[bean.getPrimaryKey()]=createUUID();
+			}
+			
+			var args={'#bean.getPrimaryKey()#'=arguments.data[bean.getPrimaryKey()]};
+			
+			bean.loadBy(argumentCollection=args);
+			bean.set('siteid',arguments.data.siteid);
+			bean.set('validationContextID',validationContextID);
+			bean.set(bean.getPrimaryKey(),arguments.data[bean.getPrimaryKey()]);
+
+			errors=bean.validate(arguments.data.fields).getErrors();
+		
+			return errors;
 		}
 
 		errors={};
 
 		if(!structIsEmpty(arguments.validations)){
-			structAppend(errors,new mura.bean.bean()
-				.set(data)
-				.setValidations(arguments.validations)
-				.validate(arguments.data.fields)
-				.getErrors()
-			);
-		}
+			var bean=new mura.bean.bean();
 
+			bean.set('validationContextID',validationContextID);
+			bean.setValidations(arguments.validations)
+			bean.validate(arguments.data.fields)
+			
+			structAppend(errors,bean.getErrors());
+		}
+	
 		if(isDefined('arguments.data.bean') && isDefined('arguments.data.loadby')){
+
+			var $=getBean('Mura').init(arguments.data.siteid);
+
+			if(!allowAccess(arguments.data.bean,$)){
+				throw(type="authorization");
+			}
+
 			var args={
 				'#arguments.data.loadby#'=arguments.data[arguments.data.loadby],
 				siteid=arguments.data.siteid
 			};
 
-			structAppend(errors,
-				getBean(arguments.data.bean)
-				.loadBy(argumentCollection=args)
-				.set(arguments.data)
-				.validate(arguments.data.fields)
-				.getErrors()
-			);
-		}
+			var bean=getBean(arguments.data.bean).loadBy(argumentCollection=args);
 
+			bean.set('validationContextID',validationContextID);
+			bean.validate(arguments.data.fields)
+				
+			structAppend(errors,bean.getErrors());
+		}
+		
 		return errors;
 
 	}
