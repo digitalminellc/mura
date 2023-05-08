@@ -3730,8 +3730,6 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 	
 		if(isDefined('arguments.data.bean') && isDefined('arguments.data.loadby')){
 
-			var $=getBean('Mura').init(arguments.data.siteid);
-
 			if(!allowAccess(arguments.data.bean,$)){
 				throw(type="authorization");
 			}
