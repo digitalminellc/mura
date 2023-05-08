@@ -279,6 +279,8 @@ function addParam(required string field="", required string relationship="and", 
 		arguments.criteria=arguments.value;
 	}
 
+	arguments.field=sanitizedValue(arguments.field);
+	
 	if(isValid('variablename',arguments.field) && isdefined('set#arguments.field#')){
 			setValue(arguments.field,arguments.criteria);
 			return this;
