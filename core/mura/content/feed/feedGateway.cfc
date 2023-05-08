@@ -1031,7 +1031,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 
 <cffunction name="sanitizedValue" output="false">
 	<cfargument name="value">
-	<cfreturn REReplace(arguments.value,"[^0-9A-Za-z\._,\- ]\*","","all")>
+	<cfreturn REReplace(arguments.value,"[^0-9A-Za-z\._,\-\*]","","all")>
 </cffunction>
 
 </cfcomponent>

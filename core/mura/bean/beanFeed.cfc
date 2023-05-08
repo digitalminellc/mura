@@ -280,7 +280,7 @@ function addParam(required string field="", required string relationship="and", 
 	}
 
 	arguments.field=sanitizedValue(arguments.field);
-	
+
 	if(isValid('variablename',arguments.field) && isdefined('set#arguments.field#')){
 			setValue(arguments.field,arguments.criteria);
 			return this;
@@ -760,7 +760,7 @@ private function caseInsensitiveOrderBy(required orderBy) output=false {
 }
 
 function sanitizedValue(value) output=false {
-	return REReplace(value,"[^0-9A-Za-z\._,\- ]\*","","all");
+	return REReplace(value,"[^0-9A-Za-z\._,\-\*]","","all");
 }
 
 function getOffset() output=false {

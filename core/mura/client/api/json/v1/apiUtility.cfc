@@ -3667,6 +3667,10 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		param name="data.fields" default="";
 
+		if(isDefined('data.entityname') && findNoCase('feed',data.entityname)){
+			throw(type="invalidParameters");
+		}
+
 		if(structIsEmpty(arguments.validations) && isDefined('data.entityname') && isDefined('data.siteid')){
 			var bean=getBean(arguments.data.entityname);
 			var args={'#bean.getPrimaryKey()#'=arguments.data[bean.getPrimaryKey()]
