@@ -3644,8 +3644,6 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 	}
 
 	function validate(data='{}',validations='{}',siteid) {
-
-		getBean('utility').excludeFromClientCache();
 		
 		if(isSimpleValue(value=arguments.data)){
 			arguments.data=urlDecode(arguments.data);
