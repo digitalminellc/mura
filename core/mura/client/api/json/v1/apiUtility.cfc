@@ -3643,6 +3643,52 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 	}
 
+	/* 	
+		If it's a defined entity, then only allow validation on defined properties
+		If it's not a defined entity, then only allow validation on properties that don't match to defined methods
+	*/
+	function lockdownValidations(bean,validations){
+		var sanitizedValidations={};
+		if(structKeyExists(arguments.validations,'properties') && isStruct(arguments.validations.properties)){
+			for(var key in arguments.validations.properties){
+				if(arguments.bean.getEntityName() != 'bean'){
+					if(arguments.bean.hasProperty(key)){
+						sanitizedValidations.properties[key]=arguments.validations.properties[key];
+					}
+				} else {
+					if(!isDefined('arguments.bean.get#key#')){
+						sanitizedValidations.properties[key]=arguments.validations.properties[key];
+					}
+				}
+			}
+		}
+		if(structKeyExists(arguments.validations,'conditions') && isStruct(arguments.validations.conditions)){
+			sanitizedValidations.conditions={};
+			for(var condition in arguments.validations.conditions){
+				for(var key in arguments.validations.conditions['#condition#']){
+					if(arguments.bean.getEntityName() != 'bean'){
+						if(arguments.bean.hasProperty(key)){
+							if(!structKeyExists(sanitizedValidations.conditions,'#condition#')){
+								sanitizedValidations.conditions['#condition#']={};
+							}
+							sanitizedValidations.conditions['#condition#'][key]=arguments.validations.conditions['#condition#'][key];
+						}
+					} else {
+						if(!isDefined('arguments.bean.get#key#')){
+							if(!structKeyExists(sanitizedValidations.conditions,'#condition#')){
+								sanitizedValidations.conditions['#condition#']={};
+							}
+							sanitizedValidations.conditions['#condition#'][key]=arguments.validations.conditions['#condition#'][key];
+						}
+					}
+				}
+				
+			}
+		}
+
+		return sanitizedValidations;
+	}
+	
 	function validate(data='{}',validations='{}',siteid) {
 		
 		if(isSimpleValue(arguments.data)){
@@ -3677,10 +3723,9 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 		param name="request.muraValidationContext" default={};
 
 		var validationContextID=createUUID();
-
 		request.muraValidationContext['#validationContextID#']=arguments.data;
 
-		if(isDefined('arguments.data.entityname')){
+		if(isDefined('arguments.data.entityname') && arguments.data.entityname != 'bean'){
 
 			if(data.entityName=='content'){
 				if(!structKeyExists(arguments.data,'contentid')){
@@ -3716,13 +3761,13 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			var bean=new mura.bean.bean();
 
 			bean.set('validationContextID',validationContextID);
-			bean.setValidations(arguments.validations)
+			bean.setValidations(lockdownValidations(bean,arguments.validations))
 			bean.validate(arguments.data.fields)
 			
 			structAppend(errors,bean.getErrors());
 		}
 	
-		if(isDefined('arguments.data.bean') && isDefined('arguments.data.loadby')){
+		if(isDefined('arguments.data.bean') && isDefined('arguments.data.loadby') && arguments.data.bean != 'bean'){
 
 			var bean=getBean(arguments.data.bean);
 			var args={
