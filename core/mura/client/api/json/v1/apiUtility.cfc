@@ -3645,7 +3645,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 	function validate(data='{}',validations='{}',siteid) {
 		
-		if(isSimpleValue(value=arguments.data)){
+		if(isSimpleValue(arguments.data)){
 			arguments.data=urlDecode(arguments.data);
 
 			if(isJSON(arguments.data)){
@@ -3655,7 +3655,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			}
 		}
 
-		if(isSimpleValue(value=arguments.validations)){
+		if(isSimpleValue(arguments.validations)){
 			arguments.validations=urlDecode(arguments.validations);
 		
 			if(isJSON(arguments.validations)){
@@ -3674,10 +3674,6 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		var $=getBean('Mura').init(arguments.data.siteid);
 
-		if(isDefined('data.entityname') && findNoCase('feed',data.entityname)){
-			throw(type="invalidParameters");
-		}
-
 		param name="request.muraValidationContext" default={};
 
 		var validationContextID=createUUID();
@@ -3686,17 +3682,13 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		if(isDefined('arguments.data.entityname')){
 
-			var bean=getBean(arguments.data.entityname);
-
-			if(!allowAccess(data.entityname,$)){
-				throw(type="authorization");
-			}
-
 			if(data.entityName=='content'){
 				if(!structKeyExists(arguments.data,'contentid')){
 					arguments.data.contentid=createUUID();
 				}
 			}
+
+			var bean=getBean(arguments.data.entityname);
 
 			if(!structKeyExists(arguments.data,'#bean.getPrimaryKey()#')){
 				arguments.data[bean.getPrimaryKey()]=createUUID();
@@ -3704,6 +3696,10 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			
 			var args={'#bean.getPrimaryKey()#'=arguments.data[bean.getPrimaryKey()]};
 			
+			if(!allowAccess(bean,$)){
+				throw(type="authorization");
+			}
+
 			bean.loadBy(argumentCollection=args);
 			bean.set('siteid',arguments.data.siteid);
 			bean.set('validationContextID',validationContextID);
@@ -3728,17 +3724,17 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 	
 		if(isDefined('arguments.data.bean') && isDefined('arguments.data.loadby')){
 
-			if(!allowAccess(arguments.data.bean,$)){
-				throw(type="authorization");
-			}
-
+			var bean=getBean(arguments.data.bean);
 			var args={
 				'#arguments.data.loadby#'=arguments.data[arguments.data.loadby],
 				siteid=arguments.data.siteid
 			};
 
-			var bean=getBean(arguments.data.bean).loadBy(argumentCollection=args);
+			if(!allowAccess(bean,$)){
+				throw(type="authorization");
+			}
 
+			bean.loadBy(argumentCollection=args);
 			bean.set('validationContextID',validationContextID);
 			bean.validate(arguments.data.fields)
 				
