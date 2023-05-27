@@ -363,15 +363,18 @@ component output="false" accessors="true" extends="mura.baseobject" hint="This p
 
 	public function getValueForValidation(required any object, required string propertyIdentifier , constraintValue='') {
 		var validationContextId = arguments.object.get('validationContextId');
-		if(len(validationContextId) 
-			&& isDefined('request.muraValidationContext') 
-			&& structKeyExists(request.muraValidationContext,'#validationContextId#')
-			&& structKeyExists(request.muraValidationContext['#validationContextId#'],'#arguments.propertyIdentifier#')){
+		if(len(validationContextId)){
+			if(isDefined('request.muraValidationContext') 
+				&& structKeyExists(request.muraValidationContext,'#validationContextId#')
+				&& structKeyExists(request.muraValidationContext['#validationContextId#'],'#arguments.propertyIdentifier#')){
 
-			if(listFindNoCase('date,datetime',arguments.constraintValue)){
-				return arguments.object.parseDateArg(request.muraValidationContext['#validationContextId#'][arguments.propertyIdentifier]);
+				if(arguments.constraintValue=='date'){
+					return arguments.object.parseDateArg(request.muraValidationContext['#validationContextId#'][arguments.propertyIdentifier]);
+				} else {
+					return request.muraValidationContext['#validationContextId#'][arguments.propertyIdentifier];
+				}
 			} else {
-				return request.muraValidationContext['#validationContextId#'][arguments.propertyIdentifier];
+				return '';
 			}
 		} else {
 			return arguments.object.invokeMethod("get#arguments.propertyIdentifier#");
