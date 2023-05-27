@@ -98,7 +98,7 @@ component extends="mura.bean.beanORM" table='tfiles' entityName="file" hint="Thi
 				} else {
 					setValue('filename','File contains invalid Metadata');
 					if(fileExists(local.tempFile.serverDirectory & "/" & local.tempFile.serverfilename & '.' & local.tempfile.serverFileExt)){
-						fileDelete(local.tempfile.serverDirectory & fileDelim & local.tempfile.serverFilename & '.' & local.tempfile.serverFileExt);
+						fileDelete(local.tempfile.serverDirectory & "/" & local.tempfile.serverFilename & '.' & local.tempfile.serverFileExt);
 					}
 					return this;
 				}
