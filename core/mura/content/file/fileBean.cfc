@@ -92,44 +92,48 @@ component extends="mura.bean.beanORM" table='tfiles' entityName="file" hint="Thi
 				local.tempFile=fileManager.emulateUpload(filePath=getValue(getValue('fileField')));
 			}
 
-			if(isStruct(local.tempfile.exif)){
-				if(fileManager.allowMetaData(local.tempfile.exif)){
-					local.tempFile.exif=serializeJSON(local.tempFile.exif);
-				} else {
-					setValue('filename','File contains invalid Metadata');
-					if(fileExists(local.tempFile.serverDirectory & "/" & local.tempFile.serverfilename & '.' & local.tempfile.serverFileExt)){
-						fileDelete(local.tempfile.serverDirectory & "/" & local.tempfile.serverFilename & '.' & local.tempfile.serverFileExt);
+			var filePath=local.tempFile.serverDirectory & "/" & local.tempFile.serverfilename & '.' & local.tempfile.serverFileExt;
+			
+			lock name='f#hash(filePath)#' type='exclusive' timeout=10 {
+				if(isStruct(local.tempfile.exif)){
+					if(fileManager.allowMetaData(local.tempfile.exif)){
+						local.tempFile.exif=serializeJSON(local.tempFile.exif);
+					} else {
+						setValue('filename','File contains invalid Metadata');
+						if(fileExists(local.tempFile.serverDirectory & "/" & local.tempFile.serverfilename & '.' & local.tempfile.serverFileExt)){
+							fileDelete(local.tempfile.serverDirectory & "/" & local.tempfile.serverFilename & '.' & local.tempfile.serverFileExt);
+						}
+						return this;
 					}
-					return this;
 				}
-			}
 
-			var allowableExtensions=getBean('configBean').getFmAllowedExtensions();
-			var allowableMimeTypes=getBean('configBean').getAllowedMimeTypes();
+				var allowableExtensions=getBean('configBean').getFmAllowedExtensions();
+				var allowableMimeTypes=getBean('configBean').getAllowedMimeTypes();
 
-			if((!len(allowableExtensions) || listFindNoCase(allowableExtensions, local.tempFile.serverFileExt)) && (!len(allowableMimeTypes) || listFindNoCase(allowableMimeTypes, '#local.tempFile.contentType#/#local.tempFile.contentSubType#'))){
-				structAppend(variables.instance, local.tempFile);
-				structAppend(variables.instance, fileManager.process(local.tempFile,getValue('siteid')));
-				variables.instance.fileExt=local.tempFile.serverFileExt;
-				variables.instance.filename=local.tempFile.ClientFile;
+				if((!len(allowableExtensions) || listFindNoCase(allowableExtensions, local.tempFile.serverFileExt)) && (!len(allowableMimeTypes) || listFindNoCase(allowableMimeTypes, '#local.tempFile.contentType#/#local.tempFile.contentSubType#'))){
+					structAppend(variables.instance, local.tempFile);
+					structAppend(variables.instance, fileManager.process(local.tempFile,getValue('siteid')));
+					variables.instance.fileExt=local.tempFile.serverFileExt;
+					variables.instance.filename=local.tempFile.ClientFile;
 
-				//writeDump(var=variables.instance,abort=true);
+					//writeDump(var=variables.instance,abort=true);
 
-				param name='variables.instance.content' default='';
-				param name='variables.instance.exif' default={};
+					param name='variables.instance.content' default='';
+					param name='variables.instance.exif' default={};
 
-				fileManager.create(argumentCollection=variables.instance);
+					fileManager.create(argumentCollection=variables.instance);
 
-				setAllValues(getBean('file').loadBy(fileID=getValue('fileID')).getAllValues());
-			}	else {
+					setAllValues(getBean('file').loadBy(fileID=getValue('fileID')).getAllValues());
+				}	else {
 
-				var fileDelim='/';
+					var fileDelim='/';
 
-				try{
-					fileDelete(local.tempfile.serverDirectory & fileDelim & local.tempfile.serverFilename & '.' & local.tempfile.serverFileExt);
-				} catch (Any e){}
+					try{
+						fileDelete(local.tempfile.serverDirectory & fileDelim & local.tempfile.serverFilename & '.' & local.tempfile.serverFileExt);
+					} catch (Any e){}
 
-				setValue('filename','Invalid file type .' & ucase(local.tempfile.serverFileExt));
+					setValue('filename','Invalid file type .' & ucase(local.tempfile.serverFileExt));
+				}
 			}
 		} else {
 
