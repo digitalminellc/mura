@@ -97,8 +97,8 @@ component extends="mura.bean.beanORM" table='tfiles' entityName="file" hint="Thi
 					local.tempFile.exif=serializeJSON(local.tempFile.exif);
 				} else {
 					setValue('filename','File contains invalid Metadata');
-					if(fileExists(local.tempFile.serverDirectory & "/" & local.tempFile.serverfilename)){
-						fileDelete(local.tempFile.serverDirectory & "/" & local.tempFile.serverfilename);
+					if(fileExists(local.tempFile.serverDirectory & "/" & local.tempFile.serverfilename & '.' & local.tempfile.serverFileExt)){
+						fileDelete(local.tempfile.serverDirectory & fileDelim & local.tempfile.serverFilename & '.' & local.tempfile.serverFileExt);
 					}
 					return this;
 				}

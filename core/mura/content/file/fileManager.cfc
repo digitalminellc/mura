@@ -547,7 +547,8 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 			</cfif>
 			<cfset local.fileuploaded=true>
 		<cfelse>
-			<cfset local.results.serverFile=local.results.serverFileName & local.filecreateattempt & "." & local.results.serverFileExt>
+			<cfset local.results.serverFilename=local.results.serverFileName & local.filecreateattemp>
+			<cfset local.results.serverFile=local.results.serverFilename & "." & local.results.serverFileExt>
 			<cfset local.filecreateattempt=local.filecreateattempt+1>
 		</cfif>
 	</cfloop>
