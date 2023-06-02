@@ -373,11 +373,13 @@ component output="false" accessors="true" extends="mura.baseobject" hint="This p
 				} else {
 					return request.muraValidationContext['#validationContextId#'][arguments.propertyIdentifier];
 				}
+			} else if (arguments.bean.hasProperty(arguments.propertyIdentifier)){
+				return arguments.object.get(arguments.propertyIdentifier);
 			} else {
 				return '';
 			}
 		} else {
-			return arguments.object.invokeMethod("get#arguments.propertyIdentifier#");
+			return arguments.object.get(arguments.propertyIdentifier);
 		}	
 	}
 
