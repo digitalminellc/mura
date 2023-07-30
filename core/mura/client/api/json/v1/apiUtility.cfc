@@ -868,7 +868,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 				}
 			}
 
-			if (isDefined('params.method') && isDefined('#params.method#')){
+			if (isDefined('params.method') && isValid('variableName',params.method) && isDefined('#params.method#')){
 
 				if(!(listFindNoCase('validate,processAsyncObject,generateCSRFTokens',params.method) || apiEnabled)){
 					throw(type='disabled');
@@ -924,7 +924,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			}
 
 			if(arrayLen(pathInfo) > 1){
-				if(isDefined(pathInfo[2]) && pathInfo[2] != 'file'){
+				if(isValid('variableName',pathInfo[2]) && isDefined(pathInfo[2]) && pathInfo[2] != 'file'){
 					params.method=pathInfo[2];
 
 					if(!(listFindNoCase('validate,processAsyncObject',params.method) || apiEnabled)){
@@ -1229,10 +1229,14 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			} else if(params.entityName=="entityname"){
 				var primaryKey='notvalid';
 			} else {
-				if(isDefined('application.objectMappings.#params.entityName#.primaryKey')){
-					var primaryKey=application.objectMappings['#params.entityName#'].primaryKey;
-				} else if (getServiceFactory().containsBean(params.entityname)){
-					var primaryKey=getBean(params.entityname).getPrimaryKey();
+				if(isValid('variableName',params.entityName)){
+					if(isDefined('application.objectMappings.#params.entityName#.primaryKey')){
+						var primaryKey=application.objectMappings['#params.entityName#'].primaryKey;
+					} else if (getServiceFactory().containsBean(params.entityname)){
+						var primaryKey=getBean(params.entityname).getPrimaryKey();
+					} else {
+						var primaryKey='undefined';
+					}
 				} else {
 					var primaryKey='undefined';
 				}
@@ -1321,7 +1325,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		catch (authorization e){
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			return serializeResponse(statusCode=401,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'error'={'code'='invalid_request','message'='Insufficient Account Permissions'}});
@@ -1329,7 +1333,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		catch (invalidAccessToken e){
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			return serializeResponse(statusCode=401,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'error'={'code'='invalid_token','message'='Invalid Access Token'}});
@@ -1337,7 +1341,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		catch (accessTokenExpired e){
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			return serializeResponse(statusCode=401,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'error'={'code'='invalid_token','message'='Access Token Expired'}});
@@ -1345,7 +1349,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		catch (disabled e){
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			return serializeResponse(statusCode=400,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'error'={'code'='invalid_request','message'='The JSON API disabled'}});
@@ -1353,7 +1357,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		catch (invalidParameters e){
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			return serializeResponse(statusCode=400,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'error'={'code'='invalid_request','message'='Invalid parameters'}});
@@ -1361,7 +1365,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		catch (invalidEntityCall e){
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			return serializeResponse(statusCode=400,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'error'={'code'='invalid_request','message'='Invalid reference to persisted entity'}});
@@ -1369,7 +1373,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		catch (invalidMethodCall e){
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			return serializeResponse(statusCode=400,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'error'={'code'='invalid_request','message'="Invalid method call"}});
@@ -1377,7 +1381,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		catch (badRequest e){
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			return serializeResponse(statusCode=400,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'error'={'code'='invalid_request','message'="Bad Request"}});
@@ -1385,7 +1389,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 
 		catch (invalidTokens e){
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			return serializeResponse(statusCode=400,response={'apiversion'=getApiVersion(),'method'=params.method,'params'=getParamsWithOutMethod(params),'error'={'code'='invalid_request','message'="Invalid CSRF tokens"}});
@@ -1394,7 +1398,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 		catch (Any e){
 			writeLog(type="Error", file="exception", text="#e.stacktrace#");
 			param name="params.method" default="undefined";
-			if(!isDefined('#params.method#')){
+			if(!isValid('variableName',params.method) || !isDefined('#params.method#')){
 				params.method='invalid';
 			}
 			if(getBean('configBean').getDebuggingEnabled()){
@@ -1654,15 +1658,13 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 				throw(type="invalidMethodCall");
 			} else {
 				if(i mod 2){
-					params['#paramsArray[i]#']='';
+					params['# REReplace(paramsArray[i],"[^0-9A-Za-z\._,\-\*]","","all")#']='';
 				} else {
 					var previous=i-1;
-					params['#paramsArray[previous]#']=paramsArray[i];
+					params['# REReplace(paramsArray[previous],"[^0-9A-Za-z\._,\-\*]","","all")#']=paramsArray[i];
 				}
 			}
 		}
-
-		
 	}
 
 	function getRelationship(from,to){
@@ -3656,13 +3658,15 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 		var sanitizedValidations={};
 		if(structKeyExists(arguments.validations,'properties') && isStruct(arguments.validations.properties)){
 			for(var key in arguments.validations.properties){
-				if(arguments.bean.getEntityName() != 'bean'){
-					if(arguments.bean.hasProperty(key)){
-						sanitizedValidations.properties[key]=arguments.validations.properties[key];
-					}
-				} else {
-					if(!isDefined('arguments.bean.get#key#')){
-						sanitizedValidations.properties[key]=arguments.validations.properties[key];
+				if(isValid('variableName',key)){
+					if(arguments.bean.getEntityName() != 'bean'){
+						if(arguments.bean.hasProperty(key)){
+							sanitizedValidations.properties[key]=arguments.validations.properties[key];
+						}
+					} else {
+						if(!isDefined('arguments.bean.get#key#')){
+							sanitizedValidations.properties[key]=arguments.validations.properties[key];
+						}
 					}
 				}
 			}
@@ -3671,19 +3675,21 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			sanitizedValidations.conditions={};
 			for(var condition in arguments.validations.conditions){
 				for(var key in arguments.validations.conditions['#condition#']){
-					if(arguments.bean.getEntityName() != 'bean'){
-						if(arguments.bean.hasProperty(key)){
-							if(!structKeyExists(sanitizedValidations.conditions,'#condition#')){
-								sanitizedValidations.conditions['#condition#']={};
+					if(isValid('variableName',key)){
+						if(arguments.bean.getEntityName() != 'bean'){
+							if(arguments.bean.hasProperty(key)){
+								if(!structKeyExists(sanitizedValidations.conditions,'#condition#')){
+									sanitizedValidations.conditions['#condition#']={};
+								}
+								sanitizedValidations.conditions['#condition#'][key]=arguments.validations.conditions['#condition#'][key];
 							}
-							sanitizedValidations.conditions['#condition#'][key]=arguments.validations.conditions['#condition#'][key];
-						}
-					} else {
-						if(!isDefined('arguments.bean.get#key#')){
-							if(!structKeyExists(sanitizedValidations.conditions,'#condition#')){
-								sanitizedValidations.conditions['#condition#']={};
+						} else {
+							if(!isDefined('arguments.bean.get#key#')){
+								if(!structKeyExists(sanitizedValidations.conditions,'#condition#')){
+									sanitizedValidations.conditions['#condition#']={};
+								}
+								sanitizedValidations.conditions['#condition#'][key]=arguments.validations.conditions['#condition#'][key];
 							}
-							sanitizedValidations.conditions['#condition#'][key]=arguments.validations.conditions['#condition#'][key];
 						}
 					}
 				}
