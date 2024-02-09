@@ -22,7 +22,7 @@
 
 		<cfset invalidimagefilesize=application.rbFactory.getResourceBundle(session.rb).messageFormat(application.rbFactory.getKeyValue(session.rb,'sitemanager.invalidimagefilesize'),attributes.maxUploadFileSize/1024/1024)/>
 
-		<cfset guid=createGUID()>
+		<cfset guid=createUUID()>
 		<cfif attributes.bean.getType() neq 'File' and attributes.property eq 'fileid'>
 			<cfset filetype='Image'>
 		<cfelse>

@@ -107,8 +107,8 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 <cfset variables.instance.imageInterpolation="highQuality" />
 <cfset variables.instance.imageQuality=.95 />
 <cfset variables.instance.clusterIPList="" />
-<cfset variables.instance.enableDynamicContent=true />
-<cfset variables.instance.enableMuraTag=true />
+<cfset variables.instance.enableDynamicContent=false />
+<cfset variables.instance.enableMuraTag=false />
 <cfset variables.instance.dashboard=true />
 <cfset variables.instance.sortPermission="" />
 <cfset variables.instance.proxyUser="" />
@@ -202,6 +202,8 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 <cfset variables.instance.sessionBasedLockdown=true>
 <cfset variables.instance.autoPurgeOutputCache=true>
 <cfset variables.instance.AllowedImageExtensions="png,jpg,jpeg,gif,webp">
+<cfset variables.instance.maxUploadFileSize=10485760>
+<cfset variables.instance.maxUploadImageSize=10485760>
 
 <cffunction name="OnMissingMethod" output="false" hint="Handles missing method exceptions.">
 <cfargument name="MissingMethodName" type="string" required="true" hint="The name of the missing method." />
@@ -255,11 +257,13 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 
 	<cfloop collection="#arguments.config#" item="prop">
 		<cfif not listFindNoCase("webroot,filedir,plugindir,locale,port,assetpath,context",prop)>
-			<cfif isDefined("this.set#prop#")>
-				<cfset tempFunc=this["set#prop#"]>
-				<cfset tempFunc(arguments.config['#prop#'])>
-			<cfelse>
-				<cfset setValue(prop,arguments.config[prop])>
+			<cfif isValid('variableName',prop)>
+				<cfif isDefined("this.set#prop#")>
+					<cfset tempFunc=this["set#prop#"]>
+					<cfset tempFunc(arguments.config['#prop#'])>
+				<cfelse>
+					<cfset setValue(prop,arguments.config[prop])>
+				</cfif>
 			</cfif>
 		</cfif>
 	</cfloop>
@@ -852,12 +856,6 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	</cfif>
 	<cfreturn this>
 </cffunction>
-
-<!---
-<cffunction name="createGUID" output="false">
-   <cfreturn insert("-", CreateUUID(), 23) />
-</cffunction>
---->
 
 <cffunction name="loadClassExtensionManager" output="false">
 	<cfset variables.instance.extensionManager=createObject("component","mura.extend.extendManager").init(this) />

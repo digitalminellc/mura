@@ -126,6 +126,7 @@ component persistent='false' accessors='true' output='false' extends='controller
 			param name='arguments.rc.search' default='';
 			param name='arguments.rc.newsearch' default=false;
 			param name='arguments.rc.unassigned' default='0';
+			param name='arguments.rc.usertype' default='2';
 
 		// var scrubbing
 			if ( !IsBoolean(arguments.rc.ispublic) || !arguments.rc.isAdmin ) { arguments.rc.ispublic = 1; }
@@ -373,6 +374,7 @@ component persistent='false' accessors='true' output='false' extends='controller
 			search=arguments.rc.search
 			, siteid=arguments.rc.siteid
 			, ispublic=arguments.rc.isPublic
+			, usertype=arguments.rc.userType
 		);
 
 		// Iterator
@@ -403,7 +405,7 @@ component persistent='false' accessors='true' output='false' extends='controller
 			? variables.userManager.getPublicGroups(arguments.rc.siteid, 1)
 			: variables.userManager.getPrivateGroups(arguments.rc.siteid, 1);
 
-		arguments.rc.rs = getUserManager().getAdvancedSearch(session, arguments.rc.siteid, arguments.rc.ispublic);
+		arguments.rc.rs = getUserManager().getAdvancedSearch(data=session, siteid=arguments.rc.siteid, ispublic=arguments.rc.ispublic,usertype=arguments.rc.userType);
 
 		// Iterator
 			setUsersIterator(rc);
@@ -420,7 +422,7 @@ component persistent='false' accessors='true' output='false' extends='controller
 	}
 
 	public any function advancedSearchToCSV(rc) {
-		arguments.rc.records = getUserManager().getAdvancedSearch(data=session, siteid=arguments.rc.siteid, ispublic=arguments.rc.ispublic);
+		arguments.rc.records = getUserManager().getAdvancedSearch(data=session, siteid=arguments.rc.siteid, ispublic=arguments.rc.ispublic,usertype=arguments.rc.userType);
 		variables.fw.redirect(action='cUsers.download', preserve='records');
 
 	}

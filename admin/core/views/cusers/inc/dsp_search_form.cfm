@@ -43,6 +43,12 @@
   version 2 without this exception.  You may, if you choose, apply this exception to your own modified versions of Mura CMS.
 --->
 <cfoutput>
+  <cfif rc.muraAction eq "core:cusers.list" || $.event('usertype') == 1>
+    <cfset rc.userType = 1>
+  <cfelse>
+    <cfset rc.userType = 2>
+  </cfif>
+
   <form class="form-inline" novalidate="novalidate" action="" method="get" name="form1" id="siteSearch">
     <div class="mura-search">
       <span class="mura-input-set">
@@ -51,11 +57,16 @@
         <i class="mi-search"></i>
       </button>
     </span>
-      <button type="button" class="btn" onclick="actionModal();window.location='./?muraAction=cUsers.advancedSearch&amp;ispublic=#esapiEncode('url',rc.ispublic)#&amp;siteid=#esapiEncode('url',rc.siteid)#&amp;newSearch=true'" value="#rbKey('user.advanced')#">
+      <button type="button" class="btn" onclick="actionModal();window.location='./?muraAction=cUsers.advancedSearch&amp;ispublic=#esapiEncode('url',rc.ispublic)#&amp;siteid=#esapiEncode('url',rc.siteid)#&amp;usertype=#esapiEncode('url',rc.usertype)#&amp;newSearch=true'" value="#rbKey('user.advanced')#">
         #rbKey('user.advanced')#
       </button>
       <input type="hidden" name="siteid" value="#esapiEncode('html', rc.siteid)#" />
       <input type="hidden" name="ispublic" value="#esapiEncode('html', rc.ispublic)#" />
+      <cfif rc.userType == 1>
+        <input type="hidden" name="usertype" value="1" />
+      <cfelse>
+        <input type="hidden" name="usertype" value="2" />
+      </cfif>
       <input type="hidden" name="muraAction" value="cUsers.search" />
     </div>
   </form>

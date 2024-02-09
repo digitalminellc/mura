@@ -51,36 +51,38 @@
 	<cfset options[1][2]= rbKey('user.fname') >
 	<cfset options[2][1]="tusers.lname^varchar">
 	<cfset options[2][2]= rbKey('user.lname')>
-	<cfset options[3][1]="tusers.username^varchar">
-	<cfset options[3][2]= rbKey('user.username') >
-	<cfset options[4][1]="tusers.email^varchar">
-	<cfset options[4][2]= rbKey('user.email')>
-	<cfset options[5][1]="tusers.company^varchar">
-	<cfset options[5][2]= rbKey('user.company')>
-	<cfset options[6][1]="tusers.jobTitle^varchar">
-	<cfset options[6][2]= rbKey('user.jobtitle')>
-	<cfset options[7][1]="tusers.website^varchar">
-	<cfset options[7][2]= rbKey('user.website')>
+	<cfset options[3][2]= rbKey('user.groupname')>
+	<cfset options[3][1]="tusers.groupname^varchar">
+	<cfset options[4][1]="tusers.username^varchar">
+	<cfset options[4][2]= rbKey('user.username') >
+	<cfset options[5][1]="tusers.email^varchar">
+	<cfset options[5][2]= rbKey('user.email')>
+	<cfset options[6][1]="tusers.company^varchar">
+	<cfset options[6][2]= rbKey('user.company')>
+	<cfset options[7][1]="tusers.jobTitle^varchar">
+	<cfset options[7][2]= rbKey('user.jobtitle')>
+	<cfset options[8][1]="tusers.website^varchar">
+	<cfset options[8][2]= rbKey('user.website')>
 	<!---<cfset options[8][1]="tusers.IMName^varchar">
 	<cfset options[8][2]="IM Name">
 	<cfset options[8][1]="tusers.IMService^varchar">
 	<cfset options[8][2]="IM Service">--->
-	<cfset options[8][1]="tusers.mobilePhone^varchar">
-	<cfset options[8][2]= rbKey('user.mobilephone')>
-	<cfset options[9][1]="tuseraddresses.address1^varchar">
-	<cfset options[9][2]= rbKey('user.address1')>
-	<cfset options[10][1]="tuseraddresses.address2^varchar">
-	<cfset options[10][2]= rbKey('user.address2')>
-	<cfset options[11][1]="tuseraddresses.city^varchar">
-	<cfset options[11][2]= rbKey('user.city')>
-	<cfset options[12][1]="tuseraddresses.state^varchar">
-	<cfset options[12][2]= rbKey('user.state')>
-	<cfset options[13][1]="tuseraddresses.Zip^varchar">
-	<cfset options[13][2]= rbKey('user.zip')>
-	<cfset options[14][1]="tusers.created^date">
-	<cfset options[14][2]= rbKey('user.created')>
-	<cfset options[15][1]="tusers.tags^varchar">
-	<cfset options[15][2]= rbKey('user.tag')>
+	<cfset options[9][1]="tusers.mobilePhone^varchar">
+	<cfset options[9][2]= rbKey('user.mobilephone')>
+	<cfset options[10][1]="tuseraddresses.address1^varchar">
+	<cfset options[10][2]= rbKey('user.address1')>
+	<cfset options[11][1]="tuseraddresses.address2^varchar">
+	<cfset options[11][2]= rbKey('user.address2')>
+	<cfset options[12][1]="tuseraddresses.city^varchar">
+	<cfset options[12][2]= rbKey('user.city')>
+	<cfset options[13][1]="tuseraddresses.state^varchar">
+	<cfset options[13][2]= rbKey('user.state')>
+	<cfset options[14][1]="tuseraddresses.Zip^varchar">
+	<cfset options[14][2]= rbKey('user.zip')>
+	<cfset options[15][1]="tusers.created^date">
+	<cfset options[15][2]= rbKey('user.created')>
+	<cfset options[16][1]="tusers.tags^varchar">
+	<cfset options[16][2]= rbKey('user.tag')>
 
 	<!--- Extended Attributes --->
 		<cfset rsExtend=application.configBean.getClassExtensionManager().getExtendedAttributeList(siteID=rc.siteid,baseTable="tusers",activeOnly=true)>
@@ -106,14 +108,29 @@
 		<cfset criterias[7][2]=rbKey('params.beginswith')>
 		<cfset criterias[8][1]="Contains">
 		<cfset criterias[8][2]=rbKey('params.contains')>
+		
 </cfsilent>
 <cfoutput>
+
+	<cfswitch expression="#rc.userType#" >
+		<cfcase value="1">
+			<cfset membersTab = rbKey('user.membergroups')>
+			<cfset systemsTab = rbKey('user.adminusergroups')>
+			<cfset includeFile = "inc/dsp_groups_list.cfm">
+		</cfcase>
+		<cfdefaultcase>
+			<cfset membersTab = rbKey('user.sitemembers')>
+			<cfset systemsTab = rbKey('user.systemusers')>
+			<cfset includeFile = "inc/dsp_users_list.cfm">
+		</cfdefaultcase>
+		</cfswitch>
+	
 <div class="mura-header">
 	<h1>#rbKey("user.advancedusersearch")#</h1>
 
 	<!--- Basic Search Button --->
 	<div class="nav-module-specific btn-group">
-		<a class="btn" href="#buildURL(action='cusers.search', querystring='siteid=#esapiEncode('url',rc.siteid)#')#" onclick="actionModal();">
+		<a class="btn" href="#buildURL(action='cusers.search', querystring='siteid=#esapiEncode('url',rc.siteid)#&usertype=#esapiEncode('url',rc.usertype)#')#" onclick="actionModal();">
 			<i class="mi-search"></i> 
 			#rbKey('user.basicsearch')#
 		</a>
@@ -223,6 +240,7 @@
 				<input type="hidden" name="muraAction" value="cUsers.advancedSearch">
 				<input type="hidden" name="siteid" value="#esapiEncode('html', rc.siteid)#">
 				<input type="hidden" name="ispublic" value="#esapiEncode('html', rc.ispublic)#">
+				<input type="hidden" name="usertype" value="#esapiEncode('html', $.event('usertype'))#">
 				
 				<!--- Search Button --->
 					<button type="button" class="btn mura-primary" onclick="document.forms.form2.muraAction.value='cUsers.advancedSearch';submitForm(document.forms.form2);">
@@ -251,14 +269,14 @@
 						<!--- Site Members Tab --->
 							<li<cfif rc.ispublic eq 1> class="active"</cfif>>
 								<a href="#buildURL(action='cusers.advancedsearch', querystring='#rc.qs#ispublic=1')#" onclick="actionModal();">
-									#rbKey('user.sitemembers')#
+									#membersTab#
 								</a>
 							</li>
 
 		        <!--- System Users Tab --->
 							<li<cfif rc.ispublic eq 0> class="active"</cfif>>
 								<a href="#buildURL(action='cusers.advancedsearch', querystring='#rc.qs#ispublic=0')#" onclick="actionModal();">
-									#rbKey('user.systemusers')#
+									#systemsTab#
 								</a>
 							</li>
 		      </ul>
@@ -267,12 +285,12 @@
 						<div class="block block-bordered">
 							<!-- block header -->
 							<div class="block-header">
-								<h3 class="block-title"><cfif rc.ispublic eq 1>#rbKey('user.sitemembers')#<cfelse>#rbKey('user.systemusers')#</cfif></h3>
+								<h3 class="block-title"><cfif rc.ispublic eq 1>#membersTab#<cfelse>#systemsTab#</cfif></h3>
 							</div> <!-- /.block header -->						
 							<div class="block-content">
 							  	 
 					  		<!--- Search Results --->
-								<cfinclude template="inc/dsp_users_list.cfm" />
+								<cfinclude template="#includeFile#" />
 
 								</div> <!-- /.block-content -->
 						</div> <!-- /.block-bordered -->
@@ -283,9 +301,9 @@
 			<div class="block block-bordered">
 			  <div class="block-content">
 
-		      <h3>#rbKey('user.sitemembers')#</h3>
+		      <h3>#membersTab#</h3>
 					<!--- Search Results --->
-					<cfinclude template="inc/dsp_users_list.cfm" />
+					<cfinclude template="#includeFile#" />
 
 				</div> <!-- /.block-content -->
 			</div> <!-- /.block-bordered -->

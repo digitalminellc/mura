@@ -1702,7 +1702,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	WHERE
 
 	<cfif arguments.searchType eq "image">
-	tfiles.fileext in ('png','gif','jpg','jpeg') AND
+	tfiles.fileext in ('png','gif','jpg','jpeg','svg') AND
 	</cfif>
 
 	<cfif kw neq '' or arguments.tag neq ''>
@@ -1809,7 +1809,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 		WHERE
 
 		<cfif arguments.searchType eq "image">
-			tfiles.fileext in ('png','gif','jpg','jpeg') AND
+			tfiles.fileext in ('png','gif','jpg','jpeg','svg') AND
 		</cfif>
 
 		tcontent.Active = 1
@@ -2587,16 +2587,16 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	<cfset var rsObjects=""/>
 
 	<cfquery attributeCollection="#variables.configBean.getReadOnlyQRYAttrs(name='rsObjects')#">
-	select tcontentobjects.object,tcontentobjects.name,tcontentobjects.objectid, tcontentobjects.orderno, tcontentobjects.params, tplugindisplayobjects.configuratorInit from tcontentobjects
-	inner join tcontent On(
-	tcontentobjects.contenthistid=tcontent.contenthistid
-	and tcontentobjects.siteid=tcontent.siteid)
-	left join tplugindisplayobjects on (tcontentobjects.object='plugin'
-										and tcontentobjects.objectID=tplugindisplayobjects.objectID)
-	where tcontent.siteid='#arguments.siteid#'
-	and tcontent.contenthistid ='#arguments.contentHistID#'
-	and tcontentobjects.columnid=#arguments.columnID#
-	order by tcontentobjects.orderno
+		select tcontentobjects.object,tcontentobjects.name,tcontentobjects.objectid, tcontentobjects.orderno, tcontentobjects.params, tplugindisplayobjects.configuratorInit from tcontentobjects
+		inner join tcontent On(
+		tcontentobjects.contenthistid=tcontent.contenthistid
+		and tcontentobjects.siteid=tcontent.siteid)
+		left join tplugindisplayobjects on (tcontentobjects.object='plugin'
+											and tcontentobjects.objectID=tplugindisplayobjects.objectID)
+		where tcontent.siteid=<cfqueryparam value="#arguments.siteid#" cfsqltype="cf_sql_varchar">
+		and tcontent.contenthistid =<cfqueryparam value="#arguments.ContentHistID#" cfsqltype="cf_sql_varchar">
+		and tcontentobjects.columnid=<cfqueryparam value="#arguments.columnID#" cfsqltype="cf_sql_integer">
+		order by tcontentobjects.orderno
 	</cfquery>
 
 	<cfreturn rsObjects>
@@ -2610,15 +2610,15 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 
 	<cfset var rsObjectInheritence=""/>
 	<cfquery attributeCollection="#variables.configBean.getReadOnlyQRYAttrs(name='rsObjectInheritence')#">
-	select tcontentobjects.object, tcontentobjects.name, tcontentobjects.objectid, tcontentobjects.orderno, tcontentobjects.params, tplugindisplayobjects.configuratorInit from tcontentobjects
-	left join tplugindisplayobjects on (tcontentobjects.object='plugin'
-										and tcontentobjects.objectID=tplugindisplayobjects.objectID)
-	where
-	tcontentobjects.contenthistid ='#arguments.inheritedObjects#'
-	and tcontentobjects.siteid='#arguments.siteid#'
-	and tcontentobjects.columnid=#arguments.columnID#
-	and tcontentobjects.object <>'goToFirstChild'
-	order by orderno
+		select tcontentobjects.object, tcontentobjects.name, tcontentobjects.objectid, tcontentobjects.orderno, tcontentobjects.params, tplugindisplayobjects.configuratorInit from tcontentobjects
+		left join tplugindisplayobjects on (tcontentobjects.object='plugin'
+											and tcontentobjects.objectID=tplugindisplayobjects.objectID)
+		where
+		tcontentobjects.contenthistid =<cfqueryparam value="#arguments.inheritedObjects#" cfsqltype="cf_sql_varchar">
+		and tcontentobjects.siteid=<cfqueryparam value="#arguments.siteID#" cfsqltype="cf_sql_varchar">
+		and tcontentobjects.columnid=<cfqueryparam value="#arguments.columnID#" cfsqltype="cf_sql_integer">
+		and tcontentobjects.object <>'goToFirstChild'
+		order by orderno
 	</cfquery>
 
 	<cfreturn rsObjectInheritence>
