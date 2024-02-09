@@ -50,11 +50,11 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	<cfif rc.type eq 'file'>
 		<cfquery name="rsImages" dbtype="query">
 			select * from rc.rslist
-			where lower(fileExt) in ('png','jpg','jpeg','gif')
+			where lower(fileExt) in ('png','jpg','jpeg','gif','svg')
 		</cfquery>
 		<cfquery name="rsFiles" dbtype="query">
 			select * from rc.rslist
-			where lower(fileExt) not in ('png','jpg','jpeg','gif')
+			where lower(fileExt) not in ('png','jpg','jpeg','gif','svg')
 		</cfquery>
 	<cfelse>
 		<cfset rsImages=rc.rsList>
@@ -92,16 +92,16 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 							<cfsilent>
 								<cfset crumbdata=application.contentManager.getCrumbList(rsimages.contentid, rc.siteid)/>
 					       		<cfset verdict=application.permUtility.getnodePerm(crumbdata)/>
-					       		<cfset hasImage=listFindNoCase("png,gif,jpg,jpeg",rsimages.fileExt)>
+					       		<cfset hasImage=listFindNoCase("png,gif,jpg,jpeg,svg",rsimages.fileExt)>
 							</cfsilent>
 							<cfif verdict neq 'none'>
 								<cfset filtered['#rsimages.fileid#']=true>
 								<cfset counter=counter+1/>
 						        <li>
 						        <cfif hasImage>
-						        <img src="#application.configBean.getContext()#/index.cfm/_api/render/small/?fileID=#rsimages.fileid#"/><br/>
+									<img src="#$.getURLForImage(fileid=rsimages.fileid,size='small',siteid=rc.siteid,fileext=rsimages.fileExt,useProtocol=false)#?v=#createUUID()#"<cfif lcase(rsimages.fileExt) is "svg"> style="width:#$.siteConfig('smallImageWidth')#<cfif isNumeric($.siteConfig('smallImageWidth'))>px</cfif>;height:#$.siteConfig('smallImageHeight')#<cfif isNumeric($.siteConfig('smallImageWidth'))>px</cfif>;"</cfif>/><<br/>
 						        <cfelse>
-						        <i class="mi-file-text-o"></i><br/>#rsimages.assocfilename#<br>
+						        	<i class="mi-file-text-o"></i><br/>#rsimages.assocfilename#<br>
 						        </cfif>
 						        <input type="radio" name="#esapiEncode('html_attr',rc.property)#" value="#rsimages.fileid#"/></li>
 						 	</cfif>
@@ -126,7 +126,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 							<cfsilent>
 								<cfset crumbdata=application.contentManager.getCrumbList(rsfiles.contentid, rc.siteid)/>
 					       		<cfset verdict=application.permUtility.getnodePerm(crumbdata)/>
-					       		<cfset hasImage=listFindNoCase("png,gif,jpg,jpeg",rsfiles.fileExt)>
+					       		<cfset hasImage=listFindNoCase("png,gif,jpg,jpeg,svg",rsfiles.fileExt)>
 							</cfsilent>
 							<cfif verdict neq 'none'>
 								<cfset filtered['#rsfiles.fileid#']=true>

@@ -101,15 +101,36 @@
 			<cfset maxrows=990>
 		</cfif>
 
+		<cfset var local.variables.fieldList = variables.fieldList>
+
+		<cfif structKeyExists(arguments, 'usertype') && arguments.userType eq 1>
+			<cfset local.variables.fieldList = listAppend(local.variables.fieldList,'memberQuery.Counter')>
+		</cfif>
+
 		<cfquery attributeCollection="#variables.configBean.getReadOnlyQRYAttrs(name='rsUserSearch',maxrows=maxrows)#">
-		Select #variables.fieldList# from tusers
+		Select #local.variables.fieldList# from tusers
 		left join tfiles on tusers.photofileID=tfiles.fileID
-		where tusers.type=2 and tusers.isPublic = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.isPublic#"> and
-		tusers.siteid = <cfif arguments.isPublic eq 0 >
+		<cfif structKeyExists(arguments, 'usertype') && arguments.userType eq 1>
+			left join
+			(select tusersmemb.groupID, count(tusersmemb.groupID) Counter
+			from tusersmemb inner join tusers on (tusersmemb.userID=tusers.userID)
+			where
+			tusers.siteid = <cfif arguments.isPublic eq 0 >
+				'#variables.settingsManager.getSite(arguments.siteid).getPrivateUserPoolID()#'
+				<cfelse>
+				'#variables.settingsManager.getSite(arguments.siteid).getPublicUserPoolID()#'
+				</cfif>
+			group by tusersmemb.groupID
+			) memberQuery ON tusers.UserID = memberQuery.GroupID
+		</cfif>
+		where tusers.type=<cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.userType#"> 
+				and tusers.isPublic = <cfqueryparam cfsqltype="cf_sql_numeric" value="#arguments.isPublic#"> 
+				and tusers.siteid = <cfif arguments.isPublic eq 0 >
 			'#variables.settingsManager.getSite(arguments.siteid).getPrivateUserPoolID()#'
 			<cfelse>
 			'#variables.settingsManager.getSite(arguments.siteid).getPublicUserPoolID()#'
 			</cfif>
+
 
 		<cfif arguments.search eq ''>
 			and 0=1
@@ -118,6 +139,7 @@
 		 and (
 		 		tusers.lname like <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.search#%">
 		 		or tusers.fname like <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.search#%">
+				or tusers.groupname like <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.search#%">
 		 		or tusers.company like <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.search#%">
 		 		or tusers.username like <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.search#%">
 		 		or tusers.email like <cfqueryparam cfsqltype="cf_sql_varchar" value="%#arguments.search#%">
@@ -169,6 +191,9 @@
 			<cfset params=arguments.data>
 		</cfif>
 
+		<cfif structKeyExists(arguments, 'usertype')>
+			<cfset params.setType(arguments.usertype)>
+		</cfif>
 
 		<cfset isExtendedSort=(not listFindNoCase(sortOptions,params.getSortBy())) and not len(params.getSortTable())>
 
@@ -200,6 +225,12 @@
 				</cfif>
 			</cfif>
 		</cfloop>
+
+		<cfset var local.variables.fieldList = variables.fieldList>
+
+		<cfif structKeyExists(arguments, 'usertype') && arguments.userType eq 1>
+			<cfset local.variables.fieldList = listAppend(local.variables.fieldList,'memberQuery.Counter')>
+		</cfif>
 
 		<!--- Generate a sorted (if specified) list of baseIDs with additional fields --->
 		<cfquery attributeCollection="#variables.configBean.getReadOnlyQRYAttrs(name='rsAdvancedUserSearch',cachedWithin=params.getCachedWithin())#">
@@ -249,7 +280,7 @@
 				</cfif>
 				<cfset started=false>
 			<cfelse>
-				#variables.fieldList# <cfif len(params.getAdditionalColumns())>,#params.getAdditionalColumns()#</cfif>
+				#local.variables.fieldList# <cfif len(params.getAdditionalColumns())>,#params.getAdditionalColumns()#</cfif>
 			</cfif>
 		<cfelse>
 			count(*) as count
@@ -258,10 +289,25 @@
 		from tusers
 		left join tfiles on tusers.photofileID=tfiles.fileID
 
+		<cfif structKeyExists(arguments, 'usertype') && arguments.userType eq 1>
+			left join
+			(select tusersmemb.groupID, count(tusersmemb.groupID) Counter
+			from tusersmemb inner join tusers on (tusersmemb.userID=tusers.userID)
+			where
+			tusers.siteid = <cfif arguments.isPublic eq 0 >
+				'#variables.settingsManager.getSite(arguments.siteid).getPrivateUserPoolID()#'
+				<cfelse>
+				'#variables.settingsManager.getSite(arguments.siteid).getPublicUserPoolID()#'
+				</cfif>
+			group by tusersmemb.groupID
+			) memberQuery ON tusers.UserID = memberQuery.GroupID
+		</cfif>
+		
 		<cfset local.specifiedjoins=params.getJoins()>
 
 		<!--- Join to implied tables based on field prefix --->
 		<cfloop list="#jointables#" index="jointable">
+			<cfset joinTable=sanitizedValue(jointable)>
 			<cfset started=false>
 
 			<cfif arrayLen(params.getJoins())>
@@ -281,7 +327,7 @@
 		<!--- Join to explicit tables based on join clauses --->
 		<cfloop from="1" to="#arrayLen(local.specifiedjoins)#" index="local.i">
 			<cfif len(local.specifiedjoins[local.i].clause)>
-				#local.specifiedjoins[local.i].jointype# join #local.specifiedjoins[local.i].table# #tableModifier# on (#local.specifiedjoins[local.i].clause#)
+				#sanitizedValue(local.specifiedjoins[local.i].jointype)# join #sanitizedValue(local.specifiedjoins[local.i].table)# #tableModifier# on (#sanitizedValue(local.specifiedjoins[local.i].clause)#)
 			</cfif>
 		</cfloop>
 
@@ -672,7 +718,7 @@
 
 	<cfscript>
 	function sanitizedValue(value) output=false {
-		return REReplace(value,"[^0-9A-Za-z\._,\- ]\*","","all");
+		return REReplace(value,"[^0-9A-Za-z\._,\-\*]","","all");
 	}
 	</cfscript>
 

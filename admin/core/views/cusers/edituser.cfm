@@ -550,17 +550,131 @@
 										</div>
 								</cfif>
 
-							<!--- Public Groups --->
+
+							<!--- Public Groups - Selected--->
+							<div id="selected-member-groups" class="mura-control-group">
+								<label>
+									Selected #rbKey('user.membergroups')#
+								</label>
+									<cfif rc.rsPublicGroups.recordcount>
+										<cfloop query="rc.rsPublicGroups">
+											<cfif listfind(rc.userBean.getgroupid(),rc.rsPublicGroups.UserID)  or listfind(rc.groupid,rc.rsPublicGroups.UserID)>
+												<label class="checkbox">
+													<input name="groupid" type="checkbox" class="checkbox" value="#rc.rsPublicGroups.UserID#" checked >
+														#rc.rsPublicGroups.site# - #rc.rsPublicGroups.groupname#
+												</label>
+											</cfif>
+										</cfloop>
+									<cfelse>
+										<p class="help-block-empty">
+											#rbKey('user.nogroups')#
+										</p>
+									</cfif>
+								</div>
+
+							<!--- CSS for input --->
+							<style>
+								.filter {
+									border: 1px solid ##cccccc; 
+									border-width: 1px 0; 
+									padding: 15px 0px 5px 0px; 
+									margin-bottom: 10px; 
+									width: 50%;
+								}
+
+								##membergroup-filter { 
+									margin: 0 0 10px 0;
+									width: 80%;
+									padding: 10px; 
+								}
+
+								.results {
+									display:none; 
+									font-weight: bold; 
+									padding: 5px;
+								}
+							</style>
+							<!--- JS for live search of unselected groups --->
+							<script>
+								// only show the Private Groups list, if the User is a 'System User'
+								jQuery(document).ready(function($) {
+
+									var groupsTab = $("##tabGroupmemberships .block-content"),
+										selectedGroupsContainer = $("##selected-member-groups"),
+										groupsToReorder = groupsTab.children('.mura-control-group').last(),
+										groupsToReorderClone = groupsToReorder.children('.checkbox').clone(),
+										debounce = null; // create debounce variable
+
+									if (selectedGroupsContainer.children('.checkbox').length == 0) {
+										selectedGroupsContainer.hide();
+									}
+
+									// create keyup event for the new input
+									$("##membergroup-filter").keyup(function() {
+										// clear the debounce
+										clearTimeout(debounce );
+										// create variables
+										var filter =  $(this).val(),
+										searchable = groupsToReorderClone,
+										count = 0,
+										input = $(this);
+
+										// use the debounce to allow the user to type
+										debounce = setTimeout(function(){
+											// regex for filter
+											var re = new RegExp(filter.toLowerCase(), "i")
+											// Now for each to match the checkboxes label text
+											searchable.each(function () {
+												var text = $(this).text().toLowerCase(),
+													matches = !! text.match(re);
+													// Increase the count if there is a match
+													if (matches) {
+														count++;
+													}
+												// show / hide matches
+												$(this).toggle(matches);
+											})
+
+											// If the count is greater than 0 and BUT not = to the length of the list
+											// add a "Results" div
+											if (count > 0 && count !== groupsToReorderClone.length) {
+												$('.results').html('Results: ' + count + ' of ' + groupsToReorderClone.length);
+												$('.results').show();
+											} else {
+												$('.results').html('');
+												$('.results').hide();
+											}
+
+											// add the matches to the dom
+											groupsToReorder.html(searchable);
+
+										}, 600);
+									});
+
+								});
+							</script>
+							<!--- JS for live search of unselected groups --->
+							<!--- input for JS Search --->
+							<div class="filter">
+								<input type="text" class="text" id="membergroup-filter" placeholder="Search Member Groups" /> 
+								<div class="results"></div>
+							</div>
+							<!--- input for JS Search --->
+
+							<!--- Public Groups - Unselelcted--->
 							<div class="mura-control-group">
+
 								<label>
 									#rbKey('user.membergroups')#
 								</label>
 									<cfif rc.rsPublicGroups.recordcount>
 										<cfloop query="rc.rsPublicGroups">
-											<label class="checkbox">
-												<input name="groupid" type="checkbox" class="checkbox" value="#rc.rsPublicGroups.UserID#" <cfif listfind(rc.userBean.getgroupid(),rc.rsPublicGroups.UserID) or listfind(rc.groupid,rc.rsPublicGroups.UserID)>checked</cfif>>
-													#rc.rsPublicGroups.site# - #rc.rsPublicGroups.groupname#
-											</label>
+											<cfif !listfind(rc.userBean.getgroupid(),rc.rsPublicGroups.UserID) or listfind(rc.groupid,rc.rsPublicGroups.UserID)>
+												<label class="checkbox">
+													<input name="groupid" type="checkbox" class="checkbox" value="#rc.rsPublicGroups.UserID#">
+														#rc.rsPublicGroups.site# - #rc.rsPublicGroups.groupname#
+												</label>
+											</cfif>
 										</cfloop>
 									<cfelse>
 										<p class="help-block-empty">
@@ -770,13 +884,35 @@
 				<div class="load-inline tab-preloader"></div>
 				<script>$('.tab-preloader').spin(spinnerArgs2);</script>
 
+				<script>
+					// function below allows the updating of a user to either
+					// refresh in place 
+					// Or
+					// return to the user list.
+					jQuery(document).ready(function($) {
+
+						changeReturn = function(button) {
+							if (button == 'updateRefresh') {
+								$('form[name="form1"]').append('<input type="hidden" name="returnurl" value="#buildURL(action='cUsers.edituser', querystring='userid=#rc.userid#&siteid=#rc.siteid#')#">');
+							} else {
+								$('form[name="form1"]').append('<input type="hidden" name="returnurl" value="#buildURL(action='cUsers.listUsers', querystring='ispublic=#rc.tempIsPublic#')#">');
+								
+							}
+
+						}
+
+					});
+				</script>
+
 				<div class="mura-actions">
 					<div class="form-actions">
 						<cfif rc.userid eq '' or not rc.userBean.exists()>
 							<button type="button" class="btn mura-primary" onclick="userManager.submitForm(document.forms.form1,'add');"><i class="mi-check-circle"></i>#rbKey('user.add')#</button>
 						<cfelse>
 							<cfif not lockedSuper><button type="button" class="btn" onclick="submitForm(document.forms.form1,'delete','#jsStringFormat(rbKey('user.deleteuserconfirm'))#');"><i class="mi-trash"></i>#rbKey('user.delete')#</button></cfif>
-							<button type="button" class="btn mura-primary" onclick="userManager.submitForm(document.forms.form1,'update');"><i class="mi-check-circle"></i>#rbKey('user.update')#</button>
+							<button type="button" class="btn mura-primary" onclick="changeReturn('updateOnly'),userManager.submitForm(document.forms.form1,'update');"><i class="mi-check-circle"></i>#rbKey('user.update')#</button>
+							<!--- Added to allow for an update and refresh of the page --->
+							<button type="button" class="btn mura-primary" onclick="changeReturn('updateRefresh'),userManager.submitForm(document.forms.form1,'update');"><i class="mi-rotate-right"></i>Update &amp; Refresh</button>
 						</cfif>
 					</div>
 				</div>
@@ -787,14 +923,12 @@
 				<input type="hidden" name="contact" value="0">
 				<input type="hidden" name="groupid" value="">
 				<input type="hidden" name="ContactForm" value="">
-				<input type="hidden" name="returnurl" value="#buildURL(action='cUsers.listUsers', querystring='ispublic=#rc.tempIsPublic#')#">
 
 				<cfif not rsNonDefault.recordcount>
 					<input type="hidden" name="subtype" value="Default"/>
 				</cfif>
 
 				#rc.$.renderCSRFTokens(context=rc.userBean.getUserID(),format="form")#
-
 
 			</div> <!-- /.block-content.tab-content -->
 		</cfoutput>

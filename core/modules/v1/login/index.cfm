@@ -202,13 +202,15 @@
 
 							<cfif not variables.$.getBean('configBean').getValue(property='MFA',defaultValue=false)>
 								<!--- Remember Me --->
-								<div class="#this.loginFormGroupWrapperClass#">
-									<div class="#this.loginFormPrefsClass#">
-										<label class="#this.loginFormCheckboxClass#" for="cbRememberMe" >
-											<input type="checkbox" id="cbRememberMe" name="rememberMe" value="1"> #htmlEditFormat(variables.$.rbKey('user.rememberme'))#
-										</label>
+								<cfif application.configBean.getValue(property='rememberme',defaultValue=true)>
+									<div class="#this.loginFormGroupWrapperClass#">
+										<div class="#this.loginFormPrefsClass#">
+											<label class="#this.loginFormCheckboxClass#" for="cbRememberMe" >
+												<input type="checkbox" id="cbRememberMe" name="rememberMe" value="1"> #htmlEditFormat(variables.$.rbKey('user.rememberme'))#
+											</label>
+										</div>
 									</div>
-								</div>
+								</cfif>
 							</cfif>
 
 							<!--- Login Button --->
