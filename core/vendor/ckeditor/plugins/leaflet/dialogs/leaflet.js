@@ -40,9 +40,9 @@ CKEDITOR.dialog.add('leaflet', function(editor) {
 
             var config = editor.config;
 
-            // Default value, but eventually will reach its quota if many users
-            // will just utilize this key instead of creating their own.
-            var googleApiKey = 'AIzaSyA9ySM6msnGm0qQB1L1cLTMBdKEUKPySmQ';
+            // Get a Google API Key
+            // <https://support.google.com/googleapi/answer/6158862?hl=en>
+            var googleApiKey = '';
 
             if (typeof config.leaflet_maps_google_api_key != 'undefined' && config.leaflet_maps_google_api_key != '') {
               googleApiKey = config.leaflet_maps_google_api_key;

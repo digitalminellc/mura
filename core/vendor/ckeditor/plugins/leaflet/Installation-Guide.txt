@@ -35,13 +35,15 @@ II. STANDARD INSTALLATION (Usual Setup)
         "ckeditor/plugins/widget"
 
 2) Edit the "ckeditor/config.js" file, and add the following:
+   Visit <https://support.google.com/googleapi/answer/6158862?hl=en> to get your own Google API key.
+
     if there's no existing line yet:
         config.extraPlugins = "lineutils,widget,leaflet";
-        config.leaflet_maps_google_api_key = 'AIzaSyA9ySM6msnGm0qQB1L1cLTMBdKEUKPySmQ';
+        config.leaflet_maps_google_api_key = '';
 
     otherwise, append it to the existing list, no extra spaces are allowed:
         config.extraPlugins = "existing_plugin,another_existing_plugin,lineutils,widget,leaflet";
-        config.leaflet_maps_google_api_key = 'AIzaSyA9ySM6msnGm0qQB1L1cLTMBdKEUKPySmQ';
+        config.leaflet_maps_google_api_key = '';
 
 3.) Just to make sure, clear the web browser's cache after modifying your configuration.
     Clearing the browser's cache is also very important
@@ -110,7 +112,7 @@ A. DRUPAL INSTALLATION OPTION 1 (EASIER SETUP)
             As indicated in the OVERVIEW section above, Google API key is now required.
             In ADVANCED OPTIONS >>> Custom JavaScript Configuration:
             Set your personal Google API key (I've provided my personal key as sample):
-                config.leaflet_maps_google_api_key = 'AIzaSyA9ySM6msnGm0qQB1L1cLTMBdKEUKPySmQ';
+                config.leaflet_maps_google_api_key = '';
 
     3.) Then, click the Save button. Clear the Drupal's overall cache AND
         clear the browser's cache. Clearing the browser's cache is also
@@ -197,7 +199,7 @@ B. DRUPAL INSTALLATION OPTION 2
             As indicated in the OVERVIEW section above, Google API key is now required.
             In ADVANCED OPTIONS >>> Custom JavaScript Configuration:
             Set your personal Google API key (I've provided my personal key as sample):
-                config.leaflet_maps_google_api_key = 'AIzaSyA9ySM6msnGm0qQB1L1cLTMBdKEUKPySmQ';
+                config.leaflet_maps_google_api_key = '';
 
     3.) Then, click the Save button. Clear the Drupal's overall cache AND
         clear the browser's cache. Clearing the browser's cache is also
