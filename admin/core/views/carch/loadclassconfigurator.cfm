@@ -109,10 +109,14 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	<cfif rc.container eq 'layout'>
 		<cfset configFileSuffix="#rc.classid#/layout/index.cfm">
 	<cfelse>
-		<cfset objectConfig=rc.$.siteConfig().getDisplayObject(rc.classid)>
+		<cfif rc.$.siteConfig().hasDisplayObject(rc.classid)>
+			<cfset objectConfig=rc.$.siteConfig().getDisplayObject(rc.classid)>
 
-		<cfif isDefined('objectConfig.external') and objectConfig.external>
-			<cfset configFileSuffix="external/configurator.cfm">
+			<cfif isDefined('objectConfig.external') and objectConfig.external>
+				<cfset configFileSuffix="external/configurator.cfm">
+			<cfelse>
+				<cfset configFileSuffix="#rc.classid#/configurator.cfm">
+			</cfif>
 		<cfelse>
 			<cfset configFileSuffix="#rc.classid#/configurator.cfm">
 		</cfif>
