@@ -387,6 +387,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	<cfset var rsuser = ""/>
 	<cfset var userBean = ""/>
 	<cfset var autoresetpasswords=variables.configBean.getValue("autoresetpasswords")>
+	<cfset arguments.returnURL=getBean("utility").sanitizeHREF(arguments.returnURL,arguments.siteid)>
 
 		<cfif REFindNoCase("^[^@%*<>' ]+@[^@%*<>' ]{1,255}\.[^@%*<>' ]{2,5}", trim(arguments.email)) neq 0>
 					<cfset rsuser=getUserByEmail('#arguments.email#','#arguments.siteid#')>
@@ -435,7 +436,8 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	<cfset var struser=structnew()>
 	<cfset var bcc="">
 	<cfset var autoresetpasswords=variables.configBean.getValue("autoresetpasswords")>
-
+	<cfset returnURL=getBean("utility").sanitizeHREF(returnURL,arguments.siteid)>
+		
 		<cfif autoresetpasswords>
 			<cfset arguments.userBean.setPassword(getRandomPassword(12,"alphanumeric","yes")) />
 			<cfset arguments.userBean.save() />
@@ -493,7 +495,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 <cfif arguments.siteid neq ''>
 	<cfset site=variables.settingsManager.getSite(arguments.siteid)>
 	<cfset urlBase="#listFirst(cgi.http_host,':')##site.getServerPort()##site.getContext()#">
-
+	<cfset urlBase=getBean("utility").sanitizeHREF(urlBase,arguments.siteid)>
 	<cfif not len(sendLoginScript)>
 		<cfset sendLoginScript =site.getSendLoginScript()/>
 	</cfif>
@@ -514,6 +516,7 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	<cfset returnURL="#protocol##urlBase##site.getContentRenderer().getURLStem(site.getSiteID(),returnID)#">
 <cfelse>
 	<cfset urlBase="#listFirst(cgi.http_host,':')##variables.configBean.getServerPort()##variables.configBean.getContext()#">
+	<cfset urlBase=getBean("utility").sanitizeHREF(urlBase,arguments.siteid)>
 	<cfset site=variables.settingsManager.getSite("default")>
 	<cfset contactEmail=variables.configBean.getAdminEmail()/>
 	<cfset contactName=variables.configBean.getTitle()/>

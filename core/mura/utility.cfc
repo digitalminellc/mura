@@ -1159,17 +1159,30 @@
 	
 	<cffunction name="parseDomain" output="false">
 		<cfargument name="urlstring">
-		<cfreturn reReplace(arguments.urlstring, "^\w+://([^\/:]+)[\w\W]*$", "\1", "one")>
+		<cfset var parsed=reReplace(arguments.urlstring, "^\w+://([^\/:]+)[\w\W]*$", "\1", "one")>
+		<cfif len(parsed) gt 1 and left(parsed,2) eq '//'>
+			<cfset parsed=listFirst(right(parsed,len(parsed)-2),'/')>
+		</cfif>
+		<cfreturn parsed>
 	</cffunction>
 	
 	<cffunction name="sanitizeHref" output="false">
 		<cfargument name="href">
+		<cfargument name="siteid" default="">
 	
-		<cfif len(arguments.href) and listFindNoCase("http,https",listFirst(arguments.href,":"))>
+		<cfif len(arguments.href) and (
+			listFindNoCase("http,https",listFirst(arguments.href,":"))
+			or len(arguments.href) gt 1 and left(arguments.href,2) eq "//"
+		)>
+			<cfif not len(arguments.siteid)>
+				<cfset sessionData=getSession()>
+				<cfset arguments.siteid=sessionData.siteid>
+			</cfif>
+			
 			<cfset var returnProtocol = listFirst(arguments.href,':') />
 			<cfset var returnDomain = parseDomain(arguments.href) />
 			<cfif not listfindNoCase(getBean('settingsManager').getAccessControlOriginDomainList(),returnDomain) and len(returnDomain)>	
-				<cfset arguments.href=replace(arguments.href,returnDomain,getRequestHost())>
+				<cfset arguments.href=replace(arguments.href,returnDomain,getBean('settingsManager').getSite(arguments.siteid).getDomain())>
 			</cfif>
 		</cfif>
 	
