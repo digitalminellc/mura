@@ -190,8 +190,6 @@ component extends="mura.bean.beanORM"  table="tapprovalrequests" entityname="app
 			var contentName=contentBean.getMenuTitle();
 			var contentType=contentBean.getType() & '/' & contentBean.getSubType();
 
-			var finder=refind('##.+?##',script,1,"true");
-
 			var placeholders="##returnURL##^##contentName##^##contentType##^##approvalHistory##";
 			var replacements="#returnURL#^#contentName#^#contentType#^#approvalHistory#";
 			script=replaceList(script,placeholders,replacements,"^","^",true);
@@ -199,7 +197,7 @@ component extends="mura.bean.beanORM"  table="tapprovalrequests" entityname="app
 			if(listFindNoCase('Canceled,Rejected,Approved',arguments.actionType)){
 				//try{
 					getBean('mailer').sendText(
-						$.setDynamicContent(script),
+						script,
 						$.event('requester').getEmail(),
 						$.siteConfig('site'),
 						subject,
