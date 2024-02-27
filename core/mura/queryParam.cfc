@@ -184,10 +184,12 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 	<cfargument name="condition">
 	<cfset var tmp="" />
 
-	<cftry>
-		<cfset tmp=getContentRenderer().setDynamicContent(arguments.criteria) />
-	<cfcatch><cfset tmp=arguments.criteria /></cfcatch>
-	</cftry>
+	<cfif not request.muraApiRequest>
+		<cftry>
+			<cfset tmp=getContentRenderer().setDynamicContent(arguments.criteria) />
+		<cfcatch><cfset tmp=arguments.criteria /></cfcatch>
+		</cftry>
+	</cfif>
 
 	<cfif not len(getDataType()) and len(tmp) and (LSIsDate(tmp) or IsDate(tmp))>
 		<cfset setDataType('datetime') />
