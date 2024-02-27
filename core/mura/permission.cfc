@@ -346,9 +346,6 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 			<cfset r.hasModuleAccess=0 />
 
 			<cfif not sessionData.mura.isLoggedIn >
-				<cfif cgi.HTTP_USER_AGENT eq 'vspider' and listFirst(cgi.http_host,":") eq 'LOCALHOST' >
-					<cfreturn r>
-				</cfif>
 				<cfset r.loggedIn=0>
 			</cfif>
 
