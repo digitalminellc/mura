@@ -189,6 +189,8 @@ version 2 without this exception.  You may, if you choose, apply this exception 
 			<cfset tmp=getContentRenderer().setDynamicContent(arguments.criteria) />
 		<cfcatch><cfset tmp=arguments.criteria /></cfcatch>
 		</cftry>
+	<cfelse>
+		<cfset tmp=arguments.criteria />
 	</cfif>
 
 	<cfif not len(getDataType()) and len(tmp) and (LSIsDate(tmp) or IsDate(tmp))>
