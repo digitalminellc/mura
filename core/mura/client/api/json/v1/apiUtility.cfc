@@ -852,7 +852,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			arrayDeleteAt(pathInfo,1);
 			arrayDeleteAt(pathInfo,1);
 			arrayDeleteAt(pathInfo,1);
-
+			dump('test2');abort;
 			request.returnFormat='JSON';
 
 			if (!isDefined('params.method') && arrayLen(pathInfo)){
@@ -922,7 +922,7 @@ component extends="mura.cfobject" hint="This provides JSON/REST API functionalit
 			} else if (isdefined('form.siteid') && !siteManager.siteExists(form.siteid)) {
 				throw(type="invalidParameters");
 			}
-
+		
 			if(arrayLen(pathInfo) > 1){
 				if(isValid('variableName',pathInfo[2]) && isDefined(pathInfo[2]) && pathInfo[2] != 'file'){
 					params.method=pathInfo[2];

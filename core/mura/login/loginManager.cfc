@@ -158,22 +158,18 @@ If you did not request a new authorization, contact #contactEmail#.");
 
 			}
 		} else {
-			var finder=refind('##.+?##',mailText,1,"true");
-			while ( finder.len[1] ) {
-				try {
-					mailText=replace(mailText,mid(mailText, finder.pos[1], finder.len[1]),'#trim(evaluate(mid(mailText, finder.pos[1], finder.len[1])))#');
-				} catch (any cfcatch) {
-					mailText=replace(mailText,mid(mailText, finder.pos[1], finder.len[1]),'');
-				}
-				finder=refind('##.+?##',mailText,1,"true");
-			}
+			var placeholders="##contactEmail##^##contactName##^##firstName##^##lastName##^##email##^##username##^##authcode##";
+			var replacements="#contactEmail#^#contactName#^#firstName#^#lastName#^#email#^#username#^#authcode#";
+			mailText=replaceList(mailText,placeholders,replacements,"^","^",true);
 		}
-		mailer.sendText(trim(mailText),
-	email,
-	contactName,
-	emailtitle,
-	user.getSiteID()
-	);
+		
+		mailer.sendText(
+			trim(mailText),
+			email,
+			contactName,
+			emailtitle,
+			user.getSiteID()
+		);
 	}
 
 	public function handleChallenge(rememberMe="0", contentid="", linkServID="", isAdminLogin="false", compactDisplay="false", deviceid="", publicDevice="false", failedchallenge="false") output=false {
